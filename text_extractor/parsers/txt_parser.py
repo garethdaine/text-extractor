@@ -35,7 +35,9 @@ def parse(file_path: str) -> ExtractedText:
         with open(file_path, "rb") as file:
             raw_data = file.read()
         result = chardet.detect(raw_data) if _HAS_CHARDET else None
-        encoding = result.get("encoding") if result else "utf-8"
+        encoding = (
+            result.get("encoding") if result and result.get("encoding") else "utf-8"
+        )
         try:
             text = raw_data.decode(encoding)
         except UnicodeDecodeError as e:

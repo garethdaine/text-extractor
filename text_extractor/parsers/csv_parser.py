@@ -31,7 +31,9 @@ def parse(file_path: str) -> ExtractedText:
         with open(file_path, "rb") as file:
             raw_data = file.read()
         result = chardet.detect(raw_data)
-        encoding = result.get("encoding") or encoding
+        encoding = (
+            result.get("encoding") if result and result.get("encoding") else "utf-8"
+        )
 
     try:
         dataframe = pd.read_csv(file_path, encoding=encoding)
