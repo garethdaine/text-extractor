@@ -1,6 +1,6 @@
-"""PDF parser stub."""
+"""PDF parser implementation using :mod:`pdfminer.six`."""
 
-from ..models import ExtractedText
+from ..models import ExtractedText, PageText
 
 
 def parse(file_path: str) -> ExtractedText:
@@ -16,4 +16,18 @@ def parse(file_path: str) -> ExtractedText:
     ExtractedText
         Structured text extracted from the PDF.
     """
-    raise NotImplementedError("PDF parsing not implemented yet")
+    # Import lazily to avoid heavy dependency at module import time.
+    from pdfminer.high_level import extract_pages
+    from pdfminer.layout import LTTextContainer
+
+    pages: list[PageText] = []
+    for page_number, page_layout in enumerate(extract_pages(file_path), start=1):
+        parts: list[str] = []
+        for element in page_layout:
+            if isinstance(element, LTTextContainer):
+                parts.append(element.get_text())
+        page_text = "".join(parts).strip()
+        pages.append(PageText(page_number=page_number, text=page_text, ocr=False))
+
+    combined_text = "\n".join(page.text for page in pages).strip()
+    return ExtractedText(text=combined_text, file_type="pdf", pages=pages)

@@ -23,10 +23,10 @@ A modular, test-driven document parsing engine that supports multiple file types
 
 ## 📄 Phase 3: Native Format Parsers
 
-- [ ] Implement `pdf_parser.py` using `pdfminer.six`
-- [ ] Implement `docx_parser.py` using `python-docx`
-- [ ] Implement `csv_parser.py` using `pandas`
-- [ ] Implement `txt_parser.py` using built-in Python IO
+- [x] Implement `pdf_parser.py` using `pdfminer.six`
+- [x] Implement `docx_parser.py` using `python-docx`
+- [x] Implement `csv_parser.py` using `pandas`
+- [x] Implement `txt_parser.py` using built-in Python IO
 
 ---
 
