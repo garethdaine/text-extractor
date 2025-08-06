@@ -1,14 +1,7 @@
 """CSV parser implementation using :mod:`pandas`."""
 
 from ..models import ExtractedText, PageText
-
-try:  # Optional dependency for encoding detection
-    import chardet  # type: ignore
-
-    _HAS_CHARDET = True
-except ImportError:  # pragma: no cover - chardet is optional
-    chardet = None  # type: ignore
-    _HAS_CHARDET = False
+from ..utils import HAS_CHARDET, read_file_with_encoding_detection
 
 
 def parse(file_path: str) -> ExtractedText:
@@ -26,14 +19,7 @@ def parse(file_path: str) -> ExtractedText:
     """
     import pandas as pd  # Imported lazily
 
-    encoding = "utf-8"
-    if _HAS_CHARDET:
-        with open(file_path, "rb") as file:
-            raw_data = file.read()
-        result = chardet.detect(raw_data)
-        encoding = (
-            result.get("encoding") if result and result.get("encoding") else "utf-8"
-        )
+    _, encoding = read_file_with_encoding_detection(file_path)
 
     try:
         dataframe = pd.read_csv(file_path, encoding=encoding)
@@ -41,16 +27,14 @@ def parse(file_path: str) -> ExtractedText:
         raise ValueError(
             f"Failed to parse CSV file '{file_path}': {e}"
         ) from e
-    except Exception as e:  # pragma: no cover - pandas may wrap decode errors
-        if isinstance(e, UnicodeDecodeError):
-            if not _HAS_CHARDET:
-                raise ValueError(
-                    "Failed to decode CSV file and 'chardet' is not installed for encoding detection"
-                ) from e
+    except UnicodeDecodeError as e:
+        if not HAS_CHARDET:
             raise ValueError(
-                f"Failed to decode CSV file '{file_path}' with encoding '{encoding}': {e}"
+                "Failed to decode CSV file and 'chardet' is not installed for encoding detection"
             ) from e
-        raise
+        raise ValueError(
+            f"Failed to decode CSV file '{file_path}' with encoding '{encoding}': {e}"
+        ) from e
 
     text = dataframe.to_string(index=False)
     pages = [PageText(page_number=1, text=text, ocr=False)]

@@ -1,14 +1,7 @@
 """Plain text parser using built-in IO."""
 
 from ..models import ExtractedText, PageText
-
-try:  # Optional dependency for encoding detection
-    import chardet  # type: ignore
-
-    _HAS_CHARDET = True
-except ImportError:  # pragma: no cover - chardet is optional
-    chardet = None  # type: ignore
-    _HAS_CHARDET = False
+from ..utils import HAS_CHARDET, read_file_with_encoding_detection
 
 
 def parse(file_path: str) -> ExtractedText:
@@ -28,16 +21,11 @@ def parse(file_path: str) -> ExtractedText:
         with open(file_path, "r", encoding="utf-8") as file:
             text = file.read()
     except UnicodeDecodeError:
-        if not _HAS_CHARDET:
+        if not HAS_CHARDET:
             raise ValueError(
                 "Failed to decode text file and 'chardet' is not installed for encoding detection"
             )
-        with open(file_path, "rb") as file:
-            raw_data = file.read()
-        result = chardet.detect(raw_data)
-        encoding = (
-            result.get("encoding") if result and result.get("encoding") else "utf-8"
-        )
+        raw_data, encoding = read_file_with_encoding_detection(file_path)
         try:
             text = raw_data.decode(encoding)
         except UnicodeDecodeError as e:
