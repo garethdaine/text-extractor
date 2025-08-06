@@ -18,5 +18,8 @@ def test_resolve_file_type_known_extensions(filename, expected):
 
 
 def test_resolve_file_type_unknown_extension():
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError) as exc:
         resolve_file_type("file.unknown")
+    message = str(exc.value)
+    assert ".unknown" in message
+    assert "file.unknown" not in message

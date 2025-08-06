@@ -34,4 +34,4 @@ def resolve_file_type(file_path: str) -> str:
     suffix = Path(file_path).suffix.lower()
     if suffix in _SUPPORTED_TYPES:
         return _SUPPORTED_TYPES[suffix]
-    raise ValueError(f"Unsupported file type: {file_path}")
+    raise ValueError(f"Unsupported file type: {suffix}")
