@@ -37,18 +37,20 @@ def parse(file_path: str) -> ExtractedText:
 
     try:
         dataframe = pd.read_csv(file_path, encoding=encoding)
-    except UnicodeDecodeError as e:
-        if _HAS_CHARDET:
-            raise ValueError(
-                f"Failed to decode CSV file '{file_path}' with encoding '{encoding}': {e}"
-            ) from e
-        raise ValueError(
-            "Failed to decode CSV file and 'chardet' is not installed for encoding detection"
-        ) from e
     except pd.errors.ParserError as e:
         raise ValueError(
             f"Failed to parse CSV file '{file_path}': {e}"
         ) from e
+    except Exception as e:  # pragma: no cover - pandas may wrap decode errors
+        if isinstance(e, UnicodeDecodeError):
+            if not _HAS_CHARDET:
+                raise ValueError(
+                    "Failed to decode CSV file and 'chardet' is not installed for encoding detection"
+                ) from e
+            raise ValueError(
+                f"Failed to decode CSV file '{file_path}' with encoding '{encoding}': {e}"
+            ) from e
+        raise
 
     text = dataframe.to_string(index=False)
     pages = [PageText(page_number=1, text=text, ocr=False)]
