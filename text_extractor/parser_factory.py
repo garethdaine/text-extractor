@@ -44,9 +44,9 @@ def select_parser(file_path: str, mime_type: str | None = None) -> Parser:
 
     Parameters
     ----------
-    file_path:
+    file_path : str
         Path to the file to parse.
-    mime_type:
+    mime_type : str | None
         Optional MIME type hint. If provided, it is used to resolve the
         parser; otherwise the file extension is used.
 
