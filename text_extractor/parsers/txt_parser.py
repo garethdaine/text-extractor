@@ -28,7 +28,8 @@ def parse(file_path: str) -> ExtractedText:
             ) from e
         with open(file_path, "rb") as file:
             raw_data = file.read()
-        encoding = chardet.detect(raw_data).get("encoding") or "utf-8"
+        result = chardet.detect(raw_data)
+        encoding = result.get("encoding") if result else "utf-8"
         try:
             text = raw_data.decode(encoding)
         except UnicodeDecodeError as e:

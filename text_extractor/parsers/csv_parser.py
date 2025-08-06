@@ -25,10 +25,6 @@ def parse(file_path: str) -> ExtractedText:
         raise ValueError(
             f"Failed to parse CSV file '{file_path}': {e}"
         ) from e
-    except UnicodeDecodeError as e:
-        raise ValueError(
-            f"Failed to decode CSV file '{file_path}': {e}"
-        ) from e
 
     text = dataframe.to_string(index=False)
     pages = [PageText(page_number=1, text=text, ocr=False)]
