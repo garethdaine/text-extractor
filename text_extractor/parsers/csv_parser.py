@@ -26,27 +26,23 @@ def parse(file_path: str) -> ExtractedText:
     """
     import pandas as pd  # Imported lazily
 
-    try:
-        dataframe = pd.read_csv(file_path)
-    except UnicodeDecodeError:
-        if not _HAS_CHARDET:
-            raise ValueError(
-                "Failed to decode CSV file and 'chardet' is not installed for encoding detection"
-            )
+    encoding = "utf-8"
+    if _HAS_CHARDET:
         with open(file_path, "rb") as file:
             raw_data = file.read()
-        result = chardet.detect(raw_data) if _HAS_CHARDET else None
-        encoding = result.get("encoding") if result else "utf-8"
-        try:
-            dataframe = pd.read_csv(file_path, encoding=encoding)
-        except UnicodeDecodeError as e:
+        result = chardet.detect(raw_data)
+        encoding = result.get("encoding") or encoding
+
+    try:
+        dataframe = pd.read_csv(file_path, encoding=encoding)
+    except UnicodeDecodeError as e:
+        if _HAS_CHARDET:
             raise ValueError(
                 f"Failed to decode CSV file '{file_path}' with encoding '{encoding}': {e}"
             ) from e
-        except pd.errors.ParserError as e:
-            raise ValueError(
-                f"Failed to parse CSV file '{file_path}': {e}"
-            ) from e
+        raise ValueError(
+            "Failed to decode CSV file and 'chardet' is not installed for encoding detection"
+        ) from e
     except pd.errors.ParserError as e:
         raise ValueError(
             f"Failed to parse CSV file '{file_path}': {e}"
