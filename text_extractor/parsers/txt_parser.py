@@ -2,6 +2,14 @@
 
 from ..models import ExtractedText, PageText
 
+try:  # Optional dependency for encoding detection
+    import chardet  # type: ignore
+
+    _HAS_CHARDET = True
+except ImportError:  # pragma: no cover - chardet is optional
+    chardet = None  # type: ignore
+    _HAS_CHARDET = False
+
 
 def parse(file_path: str) -> ExtractedText:
     """Parse a text file and return extracted text.
@@ -20,15 +28,13 @@ def parse(file_path: str) -> ExtractedText:
         with open(file_path, "r", encoding="utf-8") as file:
             text = file.read()
     except UnicodeDecodeError:
-        try:
-            import chardet
-        except ImportError as e:
+        if not _HAS_CHARDET:
             raise ValueError(
                 "Failed to decode text file and 'chardet' is not installed for encoding detection"
-            ) from e
+            )
         with open(file_path, "rb") as file:
             raw_data = file.read()
-        result = chardet.detect(raw_data)
+        result = chardet.detect(raw_data) if _HAS_CHARDET else None
         encoding = result.get("encoding") if result else "utf-8"
         try:
             text = raw_data.decode(encoding)
