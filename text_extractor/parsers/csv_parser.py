@@ -19,6 +19,6 @@ def parse(file_path: str) -> ExtractedText:
     import pandas as pd  # Imported lazily
 
     dataframe = pd.read_csv(file_path)
-    text = dataframe.to_csv(index=False)
+    text = dataframe.to_string(index=False)
     pages = [PageText(page_number=1, text=text, ocr=False)]
     return ExtractedText(text=text, file_type="csv", pages=pages)
