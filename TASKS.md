@@ -16,8 +16,8 @@ A modular, test-driven document parsing engine that supports multiple file types
 
 ## 🧠 Phase 2: Parser Interfaces
 
-- [ ] Define unified parser interface in `parser_factory.py`
-- [ ] Implement parser selector based on file extension/MIME
+- [x] Define unified parser interface in `parser_factory.py`
+- [x] Implement parser selector based on file extension/MIME
 
 ---
 
