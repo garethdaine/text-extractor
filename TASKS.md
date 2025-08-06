@@ -8,9 +8,9 @@ A modular, test-driven document parsing engine that supports multiple file types
 
 ## ✅ Phase 1: Core Infrastructure
 
-- [ ] Create project scaffolding (`text_extractor/`, `tests/`)
-- [ ] Define output schema in `models.py` (e.g. `ExtractedText`, `PageText`)
-- [ ] Implement utility helpers in `utils.py` (e.g. file type resolver)
+- [x] Create project scaffolding (`text_extractor/`, `tests/`)
+- [x] Define output schema in `models.py` (e.g. `ExtractedText`, `PageText`)
+- [x] Implement utility helpers in `utils.py` (e.g. file type resolver)
 
 ---
 
