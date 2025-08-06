@@ -9,7 +9,7 @@ _SUPPORTED_TYPES = {
     ".txt": "txt",
     ".png": "png",
     ".jpg": "jpg",
-    ".jpeg": "jpeg",
+    ".jpeg": "jpg",
 }
 
 

@@ -11,6 +11,8 @@ from text_extractor.utils import resolve_file_type
         ("data.csv", "csv"),
         ("notes.txt", "txt"),
         ("image.PNG", "png"),
+        ("photo.jpg", "jpg"),
+        ("snapshot.JPEG", "jpg"),
     ],
 )
 def test_resolve_file_type_known_extensions(filename, expected):
