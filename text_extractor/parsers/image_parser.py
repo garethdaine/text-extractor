@@ -21,8 +21,14 @@ def parse(file_path: str) -> ExtractedText:
         Structured text extracted from the image.
     """
 
-    with Image.open(file_path) as image:
-        text = pytesseract.image_to_string(image)
+    try:
+        with Image.open(file_path) as image:
+            try:
+                text = pytesseract.image_to_string(image)
+            except Exception as exc:  # pragma: no cover - OCR failures are rare
+                raise RuntimeError("Failed to OCR image") from exc
+    except Exception as exc:  # pragma: no cover - file read failures are rare
+        raise RuntimeError(f"Failed to open image: {file_path}") from exc
 
     cleaned = text.strip()
     page = PageText(page_number=1, text=cleaned, ocr=True)

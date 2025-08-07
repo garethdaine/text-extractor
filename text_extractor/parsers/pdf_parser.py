@@ -33,14 +33,21 @@ def parse(file_path: str) -> ExtractedText:
         pages.append(PageText(page_number=page_number, text=page_text, ocr=False))
 
     combined_text = "\n".join(page.text for page in pages).strip()
-    if len(combined_text) > 0:
+    if combined_text:
         return ExtractedText(text=combined_text, file_type="pdf", pages=pages)
 
     # Fallback to OCR when no text was extracted
     ocr_pages: list[PageText] = []
-    images = convert_from_path(file_path)
+    try:
+        images = convert_from_path(file_path)
+    except Exception as exc:  # pragma: no cover - conversion failures are rare
+        raise RuntimeError("Failed to convert PDF to images for OCR") from exc
+
     for page_number, image in enumerate(images, start=1):
-        text = pytesseract.image_to_string(image).strip()
+        try:
+            text = pytesseract.image_to_string(image).strip()
+        except Exception as exc:  # pragma: no cover - OCR failures are rare
+            raise RuntimeError("Failed to OCR PDF page") from exc
         ocr_pages.append(PageText(page_number=page_number, text=text, ocr=True))
 
     combined_text = "\n".join(page.text for page in ocr_pages).strip()
