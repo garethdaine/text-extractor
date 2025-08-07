@@ -32,8 +32,8 @@ A modular, test-driven document parsing engine that supports multiple file types
 
 ## 🖼️ Phase 4: Image/OCR Parser
 
-- [ ] Implement `image_parser.py` using `pytesseract`, `pdf2image`, `Pillow`
-- [ ] Detect and fallback to OCR if PDF has no extractable text
+- [x] Implement `image_parser.py` using `pytesseract`, `pdf2image`, `Pillow`
+- [x] Detect and fallback to OCR if PDF has no extractable text
 
 ---
 
