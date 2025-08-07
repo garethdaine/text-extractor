@@ -17,15 +17,15 @@ def parse(file_path: str) -> ExtractedText:
     ExtractedText
         Structured text extracted from the file.
     """
+    raw_data, encoding = read_file_with_encoding_detection(file_path)
+
     try:
-        with open(file_path, "r", encoding="utf-8") as file:
-            text = file.read()
+        text = raw_data.decode("utf-8")
     except UnicodeDecodeError:
         if not HAS_CHARDET:
             raise ValueError(
                 "Failed to decode text file and 'chardet' is not installed for encoding detection"
             )
-        raw_data, encoding = read_file_with_encoding_detection(file_path)
         try:
             text = raw_data.decode(encoding)
         except UnicodeDecodeError as e:
