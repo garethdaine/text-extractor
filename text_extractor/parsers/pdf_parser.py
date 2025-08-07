@@ -30,4 +30,23 @@ def parse(file_path: str) -> ExtractedText:
         pages.append(PageText(page_number=page_number, text=page_text, ocr=False))
 
     combined_text = "\n".join(page.text for page in pages).strip()
-    return ExtractedText(text=combined_text, file_type="pdf", pages=pages)
+    if combined_text:
+        return ExtractedText(text=combined_text, file_type="pdf", pages=pages)
+
+    # Fallback to OCR when no text was extracted
+    from pdf2image import convert_from_path
+    import pytesseract
+
+    ocr_pages: list[PageText] = []
+    images = convert_from_path(file_path)
+    for page_number, image in enumerate(images, start=1):
+        text = pytesseract.image_to_string(image).strip()
+        ocr_pages.append(PageText(page_number=page_number, text=text, ocr=True))
+
+    combined_text = "\n".join(page.text for page in ocr_pages).strip()
+    return ExtractedText(
+        text=combined_text,
+        file_type="pdf",
+        ocr_used=True,
+        pages=ocr_pages,
+    )
