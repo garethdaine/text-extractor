@@ -1,5 +1,8 @@
 """Image parser implementation using :mod:`pytesseract`."""
 
+from PIL import Image
+import pytesseract
+
 from ..models import ExtractedText, PageText
 from ..utils import resolve_file_type
 
@@ -17,9 +20,6 @@ def parse(file_path: str) -> ExtractedText:
     ExtractedText
         Structured text extracted from the image.
     """
-    # Lazily import heavy dependencies
-    from PIL import Image
-    import pytesseract
 
     with Image.open(file_path) as image:
         text = pytesseract.image_to_string(image)
