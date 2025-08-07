@@ -1,7 +1,7 @@
 """CSV parser implementation using :mod:`pandas`."""
 
 from ..models import ExtractedText, PageText
-from ..utils import HAS_CHARDET, read_file_with_encoding_detection
+from ..utils import read_file_with_encoding_detection
 
 
 def parse(file_path: str) -> ExtractedText:
@@ -23,18 +23,7 @@ def parse(file_path: str) -> ExtractedText:
     raw_data, encoding = read_file_with_encoding_detection(file_path)
 
     try:
-        decoded = raw_data.decode(encoding)
-    except UnicodeDecodeError as e:
-        if not HAS_CHARDET:
-            raise ValueError(
-                "Failed to decode CSV file and 'chardet' is not installed for encoding detection"
-            ) from e
-        raise ValueError(
-            f"Failed to decode CSV file '{file_path}' with encoding '{encoding}': {e}"
-        ) from e
-
-    try:
-        dataframe = pd.read_csv(io.StringIO(decoded))
+        dataframe = pd.read_csv(io.BytesIO(raw_data), encoding=encoding)
     except pd.errors.ParserError as e:
         raise ValueError(
             f"Failed to parse CSV file '{file_path}': {e}"
