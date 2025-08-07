@@ -73,3 +73,35 @@ def read_file_with_encoding_detection(
         encoding = default
 
     return raw_data, encoding
+
+
+def detect_file_encoding(
+    file_path: str, default: str = "utf-8", sample_size: int = 1 << 16
+) -> str:
+    """Detect a file's text encoding without loading the entire file.
+
+    Parameters
+    ----------
+    file_path:
+        Path to the file to inspect.
+    default:
+        Fallback encoding when detection fails or ``chardet`` is unavailable.
+    sample_size:
+        Number of bytes to sample for detection.
+
+    Returns
+    -------
+    str
+        The detected encoding or ``default`` when detection fails.
+    """
+
+    with open(file_path, "rb") as file:
+        raw_sample = file.read(sample_size)
+
+    if HAS_CHARDET:
+        result = chardet.detect(raw_sample)
+        encoding = result.get("encoding") or default
+    else:
+        encoding = default
+
+    return encoding

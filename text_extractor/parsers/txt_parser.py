@@ -20,18 +20,15 @@ def parse(file_path: str) -> ExtractedText:
     raw_data, encoding = read_file_with_encoding_detection(file_path)
 
     try:
-        text = raw_data.decode("utf-8")
-    except UnicodeDecodeError:
+        text = raw_data.decode(encoding)
+    except UnicodeDecodeError as e:
         if not HAS_CHARDET:
             raise ValueError(
                 "Failed to decode text file and 'chardet' is not installed for encoding detection"
-            )
-        try:
-            text = raw_data.decode(encoding)
-        except UnicodeDecodeError as e:
-            raise ValueError(
-                f"Failed to decode text file '{file_path}' with encoding '{encoding}': {e}"
             ) from e
+        raise ValueError(
+            f"Failed to decode text file '{file_path}' with encoding '{encoding}': {e}"
+        ) from e
 
     pages = [PageText(page_number=1, text=text, ocr=False)]
     return ExtractedText(text=text, file_type="txt", pages=pages)
