@@ -3,14 +3,15 @@
 from typing import Protocol
 
 from .models import ExtractedText
-from .utils import resolve_file_type
 from .parsers import (
-    pdf_parser,
-    docx_parser,
     csv_parser,
-    txt_parser,
+    docx_parser,
     image_parser,
+    pdf_parser,
+    txt_parser,
 )
+from .utils import resolve_file_type
+from .plugin_registry import get_plugin_registry
 
 
 class Parser(Protocol):
@@ -27,6 +28,7 @@ _MIME_TYPE_MAP = {
     "text/plain": "txt",
     "image/png": "png",
     "image/jpeg": "jpg",
+    "image/webp": "webp",
 }
 
 _PARSERS: dict[str, Parser] = {
@@ -36,6 +38,7 @@ _PARSERS: dict[str, Parser] = {
     "txt": txt_parser.parse,
     "png": image_parser.parse,
     "jpg": image_parser.parse,
+    "webp": image_parser.parse,
 }
 
 
@@ -69,5 +72,10 @@ def select_parser(file_path: str, mime_type: str | None = None) -> Parser:
 
     try:
         return _PARSERS[file_type]
-    except KeyError as exc:  # pragma: no cover - defensive
-        raise ValueError(f"No parser available for file type: {file_type}") from exc
+    except KeyError:
+        # Check if there's a plugin parser for this file type
+        plugin_registry = get_plugin_registry()
+        plugin_parser = plugin_registry.get_sync_parser(file_type)
+        if plugin_parser:
+            return plugin_parser
+        raise ValueError(f"No parser available for file type: {file_type}")

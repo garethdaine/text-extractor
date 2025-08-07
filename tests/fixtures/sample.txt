@@ -1,0 +1,9 @@
+This is a sample text file for testing the text extraction tool.
+
+It contains multiple lines of text to ensure the parser can handle:
+- Basic text content
+- Multiple lines
+- Special characters: !@#$%^&*()
+- Numbers: 1234567890
+
+The parser should extract all this content correctly.

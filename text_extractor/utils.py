@@ -18,6 +18,7 @@ _SUPPORTED_TYPES = {
     ".png": "png",
     ".jpg": "jpg",
     ".jpeg": "jpg",
+    ".webp": "webp",
 }
 
 
@@ -42,6 +43,17 @@ def resolve_file_type(file_path: str) -> str:
     suffix = Path(file_path).suffix.lower()
     if suffix in _SUPPORTED_TYPES:
         return _SUPPORTED_TYPES[suffix]
+
+    # Check if there's a plugin parser for this extension
+    try:
+        from .plugin_registry import get_plugin_registry
+        plugin_registry = get_plugin_registry()
+        plugin_file_type = plugin_registry.get_file_type_from_extension(suffix)
+        if plugin_file_type:
+            return plugin_file_type
+    except ImportError:
+        pass
+
     raise ValueError(f"Unsupported file type: {suffix}")
 
 

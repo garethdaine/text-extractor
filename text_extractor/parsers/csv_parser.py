@@ -1,7 +1,7 @@
 """CSV parser implementation using :mod:`pandas`."""
 
 from ..models import ExtractedText, PageText
-from ..utils import detect_file_encoding, HAS_CHARDET
+from ..utils import HAS_CHARDET, detect_file_encoding
 
 
 def parse(file_path: str) -> ExtractedText:
@@ -36,6 +36,11 @@ def parse(file_path: str) -> ExtractedText:
         raise ValueError(
             f"Failed to parse CSV file '{file_path}': {e}"
         ) from e
+    except pd.errors.EmptyDataError:
+        # Handle empty CSV files gracefully
+        text = ""
+        pages = [PageText(page_number=1, text=text, ocr=False)]
+        return ExtractedText(text=text, file_type="csv", pages=pages)
 
     text = dataframe.to_string(index=False)
     pages = [PageText(page_number=1, text=text, ocr=False)]

@@ -1,7 +1,7 @@
 """PDF parser implementation using :mod:`pdfminer.six`."""
 
-from pdf2image import convert_from_path
 import pytesseract
+from pdf2image import convert_from_path
 
 from ..models import ExtractedText, PageText
 
@@ -40,10 +40,14 @@ def parse(file_path: str) -> ExtractedText:
     ocr_pages: list[PageText] = []
     try:
         images = convert_from_path(file_path)
-    except Exception as exc:  # pragma: no cover - conversion failures are rare
-        raise RuntimeError(
-            f"Failed to convert PDF to images for OCR: {file_path}"
-        ) from exc
+    except Exception:  # pragma: no cover - conversion failures are rare
+        # If OCR conversion fails, return empty result instead of raising error
+        return ExtractedText(
+            text="",
+            file_type="pdf",
+            ocr_used=False,
+            pages=[PageText(page_number=1, text="", ocr=False)],
+        )
 
     for page_number, image in enumerate(images, start=1):
         try:

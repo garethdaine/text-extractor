@@ -1,7 +1,7 @@
 """Image parser implementation using :mod:`pytesseract`."""
 
-from PIL import Image
 import pytesseract
+from PIL import Image
 
 from ..models import ExtractedText, PageText
 from ..utils import resolve_file_type
@@ -29,6 +29,8 @@ def parse(file_path: str) -> ExtractedText:
                 raise RuntimeError(
                     f"Failed to OCR image: {file_path}"
                 ) from exc
+    except FileNotFoundError as e:
+        raise FileNotFoundError(f"Image file not found: {file_path}") from e
     except Exception as exc:  # pragma: no cover - file read failures are rare
         raise RuntimeError(f"Failed to open image: {file_path}") from exc
 
