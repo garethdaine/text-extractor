@@ -1,6 +1,6 @@
-"""DOCX parser stub."""
+"""DOCX parser implementation using :mod:`python-docx`."""
 
-from ..models import ExtractedText
+from ..models import ExtractedText, PageText
 
 
 def parse(file_path: str) -> ExtractedText:
@@ -16,4 +16,9 @@ def parse(file_path: str) -> ExtractedText:
     ExtractedText
         Structured text extracted from the DOCX document.
     """
-    raise NotImplementedError("DOCX parsing not implemented yet")
+    from docx import Document  # Imported lazily
+
+    document = Document(file_path)
+    text = "\n".join(paragraph.text for paragraph in document.paragraphs)
+    pages = [PageText(page_number=1, text=text, ocr=False)]
+    return ExtractedText(text=text, file_type="docx", pages=pages)
