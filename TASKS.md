@@ -39,33 +39,33 @@ A modular, test-driven document parsing engine that supports multiple file types
 
 ## 🧪 Phase 5: Testing
 
-- [x] Configure `pytest` test suite
-- [x] Add fixture files for each supported file type
-- [x] Write unit tests for each parser module
-- [x] Validate OCR vs non-OCR behaviour
-- [x] Ensure JSON structure matches `models.py`
+- [ ] Configure `pytest` test suite
+- [ ] Add fixture files for each supported file type
+- [ ] Write unit tests for each parser module
+- [ ] Validate OCR vs non-OCR behaviour
+- [ ] Ensure JSON structure matches `models.py`
 
 ---
 
 ## 🔌 Phase 6: Integration Layer
 
-- [x] Implement `extract_text_from_file(path: str)` entry point
-- [x] Ensure it returns the full structured output for any supported file
-- [x] Raise meaningful errors for unsupported or malformed inputs
+- [ ] Implement `extract_text_from_file(path: str)` entry point
+- [ ] Ensure it returns the full structured output for any supported file
+- [ ] Raise meaningful errors for unsupported or malformed inputs
 
 ---
 
 ## 🧹 Phase 7: Cleanup & Linting
 
-- [x] Configure `ruff` or `flake8` + `black` for linting/formatting
-- [x] Add pre-commit hook for formatting
-- [x] Document all public interfaces with docstrings
+- [ ] Configure `ruff` or `flake8` + `black` for linting/formatting
+- [ ] Add pre-commit hook for formatting
+- [ ] Document all public interfaces with docstrings
 
 ---
 
 ## 🚀 Optional: Post-MVP Enhancements
 
-- [x] CLI runner for local usage (`python -m text_extractor`)
-- [x] Async parser interface
-- [x] Language detection module
-- [x] Plugin registration for custom parsers
+- [ ] CLI runner for local usage (`python -m text_extractor`)
+- [ ] Async parser interface
+- [ ] Language detection module
+- [ ] Plugin registration for custom parsers
