@@ -23,10 +23,10 @@ async def parse(file_path: str) -> ExtractedText:
 
     def _parse_sync():
         # Import lazily to avoid heavy dependency at module import time.
+        import pytesseract
+        from pdf2image import convert_from_path
         from pdfminer.high_level import extract_pages
         from pdfminer.layout import LTTextContainer
-        from pdf2image import convert_from_path
-        import pytesseract
 
         pages: list[PageText] = []
         for page_number, page_layout in enumerate(extract_pages(file_path), start=1):

@@ -10,8 +10,8 @@ from .parsers import (
     pdf_parser,
     txt_parser,
 )
-from .utils import resolve_file_type
 from .plugin_registry import get_plugin_registry
+from .utils import resolve_file_type
 
 
 class Parser(Protocol):
@@ -72,10 +72,10 @@ def select_parser(file_path: str, mime_type: str | None = None) -> Parser:
 
     try:
         return _PARSERS[file_type]
-    except KeyError:
+    except KeyError as err:
         # Check if there's a plugin parser for this file type
         plugin_registry = get_plugin_registry()
         plugin_parser = plugin_registry.get_sync_parser(file_type)
         if plugin_parser:
             return plugin_parser
-        raise ValueError(f"No parser available for file type: {file_type}")
+        raise ValueError(f"No parser available for file type: {file_type}") from err

@@ -1,8 +1,15 @@
 """Async factory for selecting the appropriate async parser based on file type."""
 
-import asyncio
 from typing import Protocol
 
+# Import async parsers
+from .async_parsers import (
+    async_csv_parser,
+    async_docx_parser,
+    async_image_parser,
+    async_pdf_parser,
+    async_txt_parser,
+)
 from .models import ExtractedText
 from .utils import resolve_file_type
 
@@ -10,7 +17,9 @@ from .utils import resolve_file_type
 class AsyncParser(Protocol):
     """Async callable parser interface."""
 
-    async def __call__(self, file_path: str) -> ExtractedText:  # pragma: no cover - protocol
+    async def __call__(
+        self, file_path: str
+    ) -> ExtractedText:  # pragma: no cover - protocol
         ...
 
 
@@ -23,15 +32,6 @@ _MIME_TYPE_MAP = {
     "image/jpeg": "jpg",
     "image/webp": "webp",
 }
-
-# Import async parsers
-from .async_parsers import (
-    async_pdf_parser,
-    async_docx_parser,
-    async_csv_parser,
-    async_txt_parser,
-    async_image_parser,
-)
 
 _ASYNC_PARSERS: dict[str, AsyncParser] = {
     "pdf": async_pdf_parser.parse,
@@ -75,7 +75,9 @@ def select_async_parser(file_path: str, mime_type: str | None = None) -> AsyncPa
     try:
         return _ASYNC_PARSERS[file_type]
     except KeyError as exc:  # pragma: no cover - defensive
-        raise ValueError(f"No async parser available for file type: {file_type}") from exc
+        raise ValueError(
+            f"No async parser available for file type: {file_type}"
+        ) from exc
 
 
 async def extract_text_from_file_async(file_path: str) -> ExtractedText:

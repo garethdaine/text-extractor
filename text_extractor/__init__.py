@@ -1,11 +1,21 @@
 """Core package for the text extraction tool."""
 
+from .async_parser_factory import extract_text_from_file_async
+from .language_detection import (
+    LanguageInfo,
+    detect_language,
+    detect_language_simple,
+    get_supported_languages,
+    is_english,
+)
 from .models import ExtractedText, PageText
 from .parser_factory import select_parser
+from .plugin_registry import (
+    get_plugin_registry,
+    register_async_parser,
+    register_sync_parser,
+)
 from .utils import resolve_file_type
-from .async_parser_factory import extract_text_from_file_async
-from .language_detection import detect_language, detect_language_simple, is_english, get_supported_languages, LanguageInfo
-from .plugin_registry import get_plugin_registry, register_sync_parser, register_async_parser
 
 __all__ = [
     "ExtractedText",
@@ -20,7 +30,7 @@ __all__ = [
     "LanguageInfo",
     "get_plugin_registry",
     "register_sync_parser",
-    "register_async_parser"
+    "register_async_parser",
 ]
 
 

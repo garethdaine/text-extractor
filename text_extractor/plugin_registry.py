@@ -1,9 +1,9 @@
 """Plugin registry for custom parsers."""
 
-from typing import Dict, Callable, Optional, Protocol
-from pathlib import Path
 import importlib.util
 import sys
+from pathlib import Path
+from typing import Dict, Optional, Protocol
 
 from .models import ExtractedText
 
@@ -18,7 +18,9 @@ class Parser(Protocol):
 class AsyncParser(Protocol):
     """Async callable parser interface."""
 
-    async def __call__(self, file_path: str) -> ExtractedText:  # pragma: no cover - protocol
+    async def __call__(
+        self, file_path: str
+    ) -> ExtractedText:  # pragma: no cover - protocol
         ...
 
 
@@ -36,7 +38,7 @@ class PluginRegistry:
         file_type: str,
         parser: Parser,
         extensions: Optional[list[str]] = None,
-        mime_types: Optional[list[str]] = None
+        mime_types: Optional[list[str]] = None,
     ) -> None:
         """Register a synchronous parser.
 
@@ -66,7 +68,7 @@ class PluginRegistry:
         file_type: str,
         parser: AsyncParser,
         extensions: Optional[list[str]] = None,
-        mime_types: Optional[list[str]] = None
+        mime_types: Optional[list[str]] = None,
     ) -> None:
         """Register an asynchronous parser.
 
@@ -162,7 +164,9 @@ class PluginRegistry:
         result = {}
 
         # Group by file type
-        for file_type in set(self._sync_parsers.keys()) | set(self._async_parsers.keys()):
+        for file_type in set(self._sync_parsers.keys()) | set(
+            self._async_parsers.keys()
+        ):
             supported = []
 
             # Find extensions for this file type
@@ -203,7 +207,7 @@ class PluginRegistry:
             spec.loader.exec_module(module)
 
             # Look for registration function
-            if hasattr(module, 'register_parsers'):
+            if hasattr(module, "register_parsers"):
                 module.register_parsers(self)
                 return True
 
@@ -258,7 +262,7 @@ def register_sync_parser(
     file_type: str,
     parser: Parser,
     extensions: Optional[list[str]] = None,
-    mime_types: Optional[list[str]] = None
+    mime_types: Optional[list[str]] = None,
 ) -> None:
     """Register a synchronous parser globally.
 
@@ -280,7 +284,7 @@ def register_async_parser(
     file_type: str,
     parser: AsyncParser,
     extensions: Optional[list[str]] = None,
-    mime_types: Optional[list[str]] = None
+    mime_types: Optional[list[str]] = None,
 ) -> None:
     """Register an asynchronous parser globally.
 

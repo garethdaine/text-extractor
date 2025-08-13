@@ -33,9 +33,7 @@ def parse(file_path: str) -> ExtractedText:
             f"Failed to decode CSV file '{file_path}' with encoding '{encoding}': {e}"
         ) from e
     except ParserError as e:
-        raise ValueError(
-            f"Failed to parse CSV file '{file_path}': {e}"
-        ) from e
+        raise ValueError(f"Failed to parse CSV file '{file_path}': {e}") from e
     except pd.errors.EmptyDataError:
         # Handle empty CSV files gracefully
         text = ""

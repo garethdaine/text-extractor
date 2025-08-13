@@ -1,6 +1,5 @@
 """Tests for DOCX file parser."""
 
-
 import pytest
 
 from text_extractor.models import ExtractedText

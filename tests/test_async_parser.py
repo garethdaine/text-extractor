@@ -1,8 +1,6 @@
 """Tests for async parser functionality."""
 
 import pytest
-import asyncio
-from pathlib import Path
 
 from text_extractor import extract_text_from_file_async
 from text_extractor.async_parser_factory import select_async_parser

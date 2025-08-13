@@ -2,10 +2,15 @@
 Edge case tests for utils to achieve 100% coverage.
 """
 
-import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
-from text_extractor.utils import resolve_file_type, read_file_with_encoding_detection, detect_file_encoding
+import pytest
+
+from text_extractor.utils import (
+    detect_file_encoding,
+    read_file_with_encoding_detection,
+    resolve_file_type,
+)
 
 
 class TestUtilsEdgeCases:
@@ -19,7 +24,9 @@ class TestUtilsEdgeCases:
 
     def test_resolve_file_type_unsupported_with_plugin_registry_no_match(self):
         """Test resolve_file_type with unsupported extension and plugin registry returns None."""
-        with patch('text_extractor.utils.get_plugin_registry', create=True) as mock_get_registry:
+        with patch(
+            "text_extractor.utils.get_plugin_registry", create=True
+        ) as mock_get_registry:
             mock_registry = MagicMock()
             mock_registry.get_file_type_from_extension.return_value = None
             mock_get_registry.return_value = mock_registry
@@ -29,7 +36,9 @@ class TestUtilsEdgeCases:
 
     def test_resolve_file_type_unsupported_with_import_error(self):
         """Test resolve_file_type with unsupported extension and ImportError."""
-        with patch('text_extractor.utils.get_plugin_registry', create=True) as mock_get_registry:
+        with patch(
+            "text_extractor.utils.get_plugin_registry", create=True
+        ) as mock_get_registry:
             mock_get_registry.side_effect = ImportError("Plugin registry not available")
 
             with pytest.raises(ValueError, match="Unsupported file type: .custom"):
@@ -41,7 +50,7 @@ class TestUtilsEdgeCases:
         mock_registry = MagicMock()
         mock_registry.get_file_type_from_extension.return_value = "custom"
 
-        with patch('builtins.__import__') as mock_import:
+        with patch("builtins.__import__") as mock_import:
             # Create a mock module that returns our mock registry
             mock_module = MagicMock()
             mock_module.get_plugin_registry = lambda: mock_registry
@@ -54,6 +63,7 @@ class TestUtilsEdgeCases:
         """Test resolve_file_type with successful plugin registry import - direct approach."""
         # Create a real plugin registry and register a custom type
         from text_extractor.plugin_registry import get_plugin_registry
+
         registry = get_plugin_registry()
         registry.register_sync_parser("custom", lambda x: None, [".custom"])
 
@@ -64,11 +74,13 @@ class TestUtilsEdgeCases:
         """Test resolve_file_type with forced import to cover missing lines."""
         # Force the import to happen by clearing the module cache
         import sys
-        if 'text_extractor.plugin_registry' in sys.modules:
-            del sys.modules['text_extractor.plugin_registry']
+
+        if "text_extractor.plugin_registry" in sys.modules:
+            del sys.modules["text_extractor.plugin_registry"]
 
         # Create a real plugin registry and register a custom type
         from text_extractor.plugin_registry import get_plugin_registry
+
         registry = get_plugin_registry()
         registry.register_sync_parser("custom2", lambda x: None, [".custom2"])
 
@@ -89,10 +101,10 @@ class TestUtilsEdgeCases:
 
     def test_read_file_with_encoding_detection_with_chardet(self):
         """Test read_file_with_encoding_detection with chardet available."""
-        with patch('text_extractor.utils.HAS_CHARDET', True):
-            with patch('text_extractor.utils.chardet.detect') as mock_detect:
+        with patch("text_extractor.utils.HAS_CHARDET", True):
+            with patch("text_extractor.utils.chardet.detect") as mock_detect:
                 mock_detect.return_value = {"encoding": "utf-8"}
-                with patch('builtins.open', create=True) as mock_open:
+                with patch("builtins.open", create=True) as mock_open:
                     mock_file = MagicMock()
                     mock_file.read.return_value = b"test content"
                     mock_open.return_value.__enter__.return_value = mock_file
@@ -102,8 +114,8 @@ class TestUtilsEdgeCases:
 
     def test_read_file_with_encoding_detection_without_chardet(self):
         """Test read_file_with_encoding_detection without chardet."""
-        with patch('text_extractor.utils.HAS_CHARDET', False):
-            with patch('builtins.open', create=True) as mock_open:
+        with patch("text_extractor.utils.HAS_CHARDET", False):
+            with patch("builtins.open", create=True) as mock_open:
                 mock_file = MagicMock()
                 mock_file.read.return_value = b"test content"
                 mock_open.return_value.__enter__.return_value = mock_file
@@ -113,10 +125,10 @@ class TestUtilsEdgeCases:
 
     def test_read_file_with_encoding_detection_chardet_no_encoding(self):
         """Test read_file_with_encoding_detection when chardet returns no encoding."""
-        with patch('text_extractor.utils.HAS_CHARDET', True):
-            with patch('text_extractor.utils.chardet.detect') as mock_detect:
+        with patch("text_extractor.utils.HAS_CHARDET", True):
+            with patch("text_extractor.utils.chardet.detect") as mock_detect:
                 mock_detect.return_value = {"encoding": None}
-                with patch('builtins.open', create=True) as mock_open:
+                with patch("builtins.open", create=True) as mock_open:
                     mock_file = MagicMock()
                     mock_file.read.return_value = b"test content"
                     mock_open.return_value.__enter__.return_value = mock_file
@@ -126,10 +138,10 @@ class TestUtilsEdgeCases:
 
     def test_detect_file_encoding_with_chardet(self):
         """Test detect_file_encoding with chardet available."""
-        with patch('text_extractor.utils.HAS_CHARDET', True):
-            with patch('text_extractor.utils.chardet.detect') as mock_detect:
+        with patch("text_extractor.utils.HAS_CHARDET", True):
+            with patch("text_extractor.utils.chardet.detect") as mock_detect:
                 mock_detect.return_value = {"encoding": "utf-8"}
-                with patch('builtins.open', create=True) as mock_open:
+                with patch("builtins.open", create=True) as mock_open:
                     mock_file = MagicMock()
                     mock_file.read.return_value = b"test content"
                     mock_open.return_value.__enter__.return_value = mock_file
@@ -139,8 +151,8 @@ class TestUtilsEdgeCases:
 
     def test_detect_file_encoding_without_chardet(self):
         """Test detect_file_encoding without chardet."""
-        with patch('text_extractor.utils.HAS_CHARDET', False):
-            with patch('builtins.open', create=True) as mock_open:
+        with patch("text_extractor.utils.HAS_CHARDET", False):
+            with patch("builtins.open", create=True) as mock_open:
                 mock_file = MagicMock()
                 mock_file.read.return_value = b"test content"
                 mock_open.return_value.__enter__.return_value = mock_file
@@ -150,10 +162,10 @@ class TestUtilsEdgeCases:
 
     def test_detect_file_encoding_chardet_no_encoding(self):
         """Test detect_file_encoding when chardet returns no encoding."""
-        with patch('text_extractor.utils.HAS_CHARDET', True):
-            with patch('text_extractor.utils.chardet.detect') as mock_detect:
+        with patch("text_extractor.utils.HAS_CHARDET", True):
+            with patch("text_extractor.utils.chardet.detect") as mock_detect:
                 mock_detect.return_value = {"encoding": None}
-                with patch('builtins.open', create=True) as mock_open:
+                with patch("builtins.open", create=True) as mock_open:
                     mock_file = MagicMock()
                     mock_file.read.return_value = b"test content"
                     mock_open.return_value.__enter__.return_value = mock_file

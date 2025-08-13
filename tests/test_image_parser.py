@@ -1,6 +1,5 @@
 """Tests for image file parser."""
 
-
 import pytest
 
 from text_extractor.models import ExtractedText
@@ -19,14 +18,14 @@ class TestImageParser:
             pytest.skip("Pillow not available")
 
         # Create a white image
-        img = Image.new('RGB', (400, 200), color='white')
+        img = Image.new("RGB", (400, 200), color="white")
         draw = ImageDraw.Draw(img)
 
         # Try to add text (OCR might not work without proper font)
         try:
             # Use default font
-            draw.text((50, 50), "Hello, World!", fill='black')
-            draw.text((50, 80), "This is test text in an image.", fill='black')
+            draw.text((50, 50), "Hello, World!", fill="black")
+            draw.text((50, 80), "This is test text in an image.", fill="black")
         except Exception:
             # If font fails, just create a simple image
             pass
@@ -51,11 +50,11 @@ class TestImageParser:
             pytest.skip("Pillow not available")
 
         # Create a simple image
-        img = Image.new('RGB', (300, 150), color='white')
+        img = Image.new("RGB", (300, 150), color="white")
         draw = ImageDraw.Draw(img)
 
         try:
-            draw.text((30, 30), "Test JPG image", fill='black')
+            draw.text((30, 30), "Test JPG image", fill="black")
         except Exception:
             pass
 
@@ -78,7 +77,7 @@ class TestImageParser:
             pytest.skip("Pillow not available")
 
         # Create a simple colored image without text
-        img = Image.new('RGB', (200, 100), color='blue')
+        img = Image.new("RGB", (200, 100), color="blue")
 
         test_file = tmp_path / "no_text.png"
         img.save(str(test_file))
@@ -101,16 +100,16 @@ class TestImageParser:
             pytest.skip("Pillow not available")
 
         # Create a more complex image
-        img = Image.new('RGB', (500, 300), color='white')
+        img = Image.new("RGB", (500, 300), color="white")
         draw = ImageDraw.Draw(img)
 
         # Draw some shapes and try to add text
-        draw.rectangle([50, 50, 450, 250], outline='black', width=2)
-        draw.line([50, 150, 450, 150], fill='red', width=3)
+        draw.rectangle([50, 50, 450, 250], outline="black", width=2)
+        draw.line([50, 150, 450, 150], fill="red", width=3)
 
         try:
-            draw.text((100, 100), "Complex Image", fill='black')
-            draw.text((100, 130), "With multiple elements", fill='blue')
+            draw.text((100, 100), "Complex Image", fill="black")
+            draw.text((100, 130), "With multiple elements", fill="blue")
         except Exception:
             pass
 
@@ -138,7 +137,7 @@ class TestImageParser:
             pytest.skip("Pillow not available")
 
         # Create a simple image
-        img = Image.new('RGB', (100, 100), color='white')
+        img = Image.new("RGB", (100, 100), color="white")
 
         # Test PNG
         png_file = tmp_path / "test.png"
@@ -162,7 +161,7 @@ class TestImageParser:
             pytest.skip("Pillow not available")
 
         # Create a simple image
-        img = Image.new('RGB', (50, 50), color='white')
+        img = Image.new("RGB", (50, 50), color="white")
 
         test_file = tmp_path / "ocr_test.png"
         img.save(str(test_file))

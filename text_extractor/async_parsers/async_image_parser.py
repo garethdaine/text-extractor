@@ -2,8 +2,8 @@
 
 import asyncio
 
-from PIL import Image
 import pytesseract
+from PIL import Image
 
 from ..models import ExtractedText, PageText
 from ..utils import resolve_file_type
@@ -26,14 +26,13 @@ async def parse(file_path: str) -> ExtractedText:
     loop = asyncio.get_event_loop()
 
     def _parse_sync():
+        text = ""
         try:
             with Image.open(file_path) as image:
                 try:
                     text = pytesseract.image_to_string(image)
                 except Exception as exc:  # pragma: no cover - OCR failures are rare
-                    raise RuntimeError(
-                        f"Failed to OCR image: {file_path}"
-                    ) from exc
+                    raise RuntimeError(f"Failed to OCR image: {file_path}") from exc
         except FileNotFoundError as e:
             raise FileNotFoundError(f"Image file not found: {file_path}") from e
         except Exception as exc:  # pragma: no cover - file read failures are rare

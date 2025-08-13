@@ -2,15 +2,14 @@
 Tests for language detection edge cases.
 """
 
-import pytest
 from unittest.mock import patch
 
 from text_extractor.language_detection import (
+    LanguageInfo,
     detect_language,
     detect_language_simple,
-    is_english,
     get_supported_languages,
-    LanguageInfo,
+    is_english,
 )
 
 
@@ -19,7 +18,7 @@ class TestLanguageDetectionEdgeCases:
 
     def test_detect_language_import_error(self):
         """Test language detection when langdetect is not available."""
-        with patch('langdetect.detect') as mock_detect:
+        with patch("langdetect.detect") as mock_detect:
             mock_detect.side_effect = ImportError("langdetect not available")
 
             result = detect_language("Test text")
@@ -27,8 +26,9 @@ class TestLanguageDetectionEdgeCases:
 
     def test_detect_language_langdetect_exception(self):
         """Test language detection when langdetect raises an exception."""
-        with patch('langdetect.detect') as mock_detect:
+        with patch("langdetect.detect") as mock_detect:
             from langdetect.lang_detect_exception import LangDetectException
+
             mock_detect.side_effect = LangDetectException("Detection failed", "message")
 
             result = detect_language("Test text")
@@ -51,7 +51,7 @@ class TestLanguageDetectionEdgeCases:
 
     def test_detect_language_simple_import_error(self):
         """Test simple language detection when langdetect is not available."""
-        with patch('text_extractor.language_detection.detect_language') as mock_detect:
+        with patch("text_extractor.language_detection.detect_language") as mock_detect:
             mock_detect.return_value = None
 
             result = detect_language_simple("Test text")
@@ -59,7 +59,7 @@ class TestLanguageDetectionEdgeCases:
 
     def test_detect_language_simple_success(self):
         """Test simple language detection with successful detection."""
-        with patch('text_extractor.language_detection.detect_language') as mock_detect:
+        with patch("text_extractor.language_detection.detect_language") as mock_detect:
             mock_result = LanguageInfo(language="en", confidence=0.9, is_reliable=True)
             mock_detect.return_value = mock_result
 
@@ -68,7 +68,7 @@ class TestLanguageDetectionEdgeCases:
 
     def test_is_english_detection_fails(self):
         """Test is_english when language detection fails."""
-        with patch('text_extractor.language_detection.detect_language') as mock_detect:
+        with patch("text_extractor.language_detection.detect_language") as mock_detect:
             mock_detect.return_value = None
 
             result = is_english("Test text")
@@ -76,7 +76,7 @@ class TestLanguageDetectionEdgeCases:
 
     def test_is_english_not_english(self):
         """Test is_english when text is not English."""
-        with patch('text_extractor.language_detection.detect_language') as mock_detect:
+        with patch("text_extractor.language_detection.detect_language") as mock_detect:
             mock_result = LanguageInfo(language="es", confidence=0.9, is_reliable=True)
             mock_detect.return_value = mock_result
 
@@ -85,7 +85,7 @@ class TestLanguageDetectionEdgeCases:
 
     def test_is_english_not_reliable(self):
         """Test is_english when detection is not reliable."""
-        with patch('text_extractor.language_detection.detect_language') as mock_detect:
+        with patch("text_extractor.language_detection.detect_language") as mock_detect:
             mock_result = LanguageInfo(language="en", confidence=0.5, is_reliable=False)
             mock_detect.return_value = mock_result
 
@@ -94,7 +94,7 @@ class TestLanguageDetectionEdgeCases:
 
     def test_is_english_success(self):
         """Test is_english when text is reliably detected as English."""
-        with patch('text_extractor.language_detection.detect_language') as mock_detect:
+        with patch("text_extractor.language_detection.detect_language") as mock_detect:
             mock_result = LanguageInfo(language="en", confidence=0.9, is_reliable=True)
             mock_detect.return_value = mock_result
 

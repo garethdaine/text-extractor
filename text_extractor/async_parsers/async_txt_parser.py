@@ -1,7 +1,6 @@
 """Async text file parser implementation."""
 
 import asyncio
-from pathlib import Path
 
 from ..models import ExtractedText, PageText
 from ..utils import detect_file_encoding
@@ -25,7 +24,7 @@ async def parse(file_path: str) -> ExtractedText:
 
     def _parse_sync():
         encoding = detect_file_encoding(file_path)
-        with open(file_path, "r", encoding=encoding) as file:
+        with open(file_path, encoding=encoding) as file:
             text = file.read()
         return text
 

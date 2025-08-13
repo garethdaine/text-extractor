@@ -27,7 +27,10 @@ class TestParserSelection:
         """Test parser selection using MIME type."""
         mime_test_cases = [
             ("application/pdf", _PARSERS["pdf"]),
-            ("application/vnd.openxmlformats-officedocument.wordprocessingml.document", _PARSERS["docx"]),
+            (
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                _PARSERS["docx"],
+            ),
             ("text/csv", _PARSERS["csv"]),
             ("text/plain", _PARSERS["txt"]),
             ("image/png", _PARSERS["png"]),

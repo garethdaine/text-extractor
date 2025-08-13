@@ -90,7 +90,7 @@ All core and optional tasks have been successfully implemented and tested:
 - **Plugin registry**: Dynamic loading of parser plugins from files and directories
 
 ### ✅ Testing & Quality
-- **Comprehensive test suite**: 78 tests covering all parsers and edge cases
+- **Comprehensive test suite**: 211 tests covering all parsers and edge cases
 - **High code coverage**: Good coverage of core functionality
 - **Linting & formatting**: Ruff and Black configured for code quality
 - **Documentation**: Complete docstrings for all public interfaces
@@ -101,7 +101,7 @@ All core and optional tasks have been successfully implemented and tested:
 - **Verbose mode**: Detailed output with file type and OCR usage information
 
 ### 📊 Test Results
-- **78 tests passed** ✅
+- **211 tests passed** ✅
 - **0 tests failed** ✅
 - **All parsers working** ✅
 - **OCR integration tested** ✅

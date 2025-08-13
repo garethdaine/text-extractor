@@ -47,6 +47,7 @@ def resolve_file_type(file_path: str) -> str:
     # Check if there's a plugin parser for this extension
     try:
         from .plugin_registry import get_plugin_registry
+
         plugin_registry = get_plugin_registry()
         plugin_file_type = plugin_registry.get_file_type_from_extension(suffix)
         if plugin_file_type:

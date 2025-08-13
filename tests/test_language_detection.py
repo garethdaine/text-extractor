@@ -1,13 +1,11 @@
 """Tests for language detection functionality."""
 
-import pytest
-
 from text_extractor.language_detection import (
+    LanguageInfo,
     detect_language,
     detect_language_simple,
-    is_english,
     get_supported_languages,
-    LanguageInfo,
+    is_english,
 )
 
 
@@ -78,9 +76,9 @@ class TestLanguageDetection:
         result = detect_language("Hello, world!")
 
         assert isinstance(result, LanguageInfo)
-        assert hasattr(result, 'language')
-        assert hasattr(result, 'confidence')
-        assert hasattr(result, 'is_reliable')
+        assert hasattr(result, "language")
+        assert hasattr(result, "confidence")
+        assert hasattr(result, "is_reliable")
         assert isinstance(result.language, str)
         assert isinstance(result.confidence, float)
         assert isinstance(result.is_reliable, bool)

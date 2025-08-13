@@ -2,14 +2,15 @@
 Tests for async parser factory.
 """
 
-import pytest
 from unittest.mock import patch
 
+import pytest
+
 from text_extractor.async_parser_factory import (
-    select_async_parser,
-    extract_text_from_file_async,
     _ASYNC_PARSERS,
     _MIME_TYPE_MAP,
+    extract_text_from_file_async,
+    select_async_parser,
 )
 
 
@@ -44,7 +45,10 @@ class TestAsyncParserFactory:
         parser = select_async_parser("test.unknown", "application/pdf")
         assert parser == _ASYNC_PARSERS["pdf"]
 
-        parser = select_async_parser("test.unknown", "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+        parser = select_async_parser(
+            "test.unknown",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        )
         assert parser == _ASYNC_PARSERS["docx"]
 
         parser = select_async_parser("test.unknown", "text/csv")
@@ -81,7 +85,10 @@ class TestAsyncParserFactory:
     @pytest.mark.asyncio
     async def test_extract_text_from_file_async_success(self):
         """Test successful async text extraction."""
-        with patch('text_extractor.async_parser_factory.select_async_parser') as mock_select:
+        with patch(
+            "text_extractor.async_parser_factory.select_async_parser"
+        ) as mock_select:
+
             async def mock_parser(file_path):
                 return "Mock result"
 
@@ -94,7 +101,9 @@ class TestAsyncParserFactory:
     @pytest.mark.asyncio
     async def test_extract_text_from_file_async_parser_error(self):
         """Test async text extraction with parser error."""
-        with patch('text_extractor.async_parser_factory.select_async_parser') as mock_select:
+        with patch(
+            "text_extractor.async_parser_factory.select_async_parser"
+        ) as mock_select:
             mock_parser = mock_select.return_value
             mock_parser.side_effect = Exception("Parser error")
 
@@ -113,7 +122,9 @@ class TestAsyncParserFactory:
         supported_types = ["pdf", "docx", "csv", "txt", "png", "jpg", "webp"]
 
         for mime_type, file_type in _MIME_TYPE_MAP.items():
-            assert file_type in supported_types, f"Invalid file type {file_type} for MIME type {mime_type}"
+            assert (
+                file_type in supported_types
+            ), f"Invalid file type {file_type} for MIME type {mime_type}"
 
     def test_async_parser_interface(self):
         """Test that all async parsers are callable."""
@@ -126,7 +137,12 @@ class TestAsyncParserFactory:
         assert _MIME_TYPE_MAP["application/pdf"] == "pdf"
 
         # Test that DOCX MIME type maps to docx
-        assert _MIME_TYPE_MAP["application/vnd.openxmlformats-officedocument.wordprocessingml.document"] == "docx"
+        assert (
+            _MIME_TYPE_MAP[
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            ]
+            == "docx"
+        )
 
         # Test that CSV MIME type maps to csv
         assert _MIME_TYPE_MAP["text/csv"] == "csv"

@@ -82,13 +82,15 @@ Examples:
         else:
             output_lines = []
             if args.verbose:
-                output_lines.extend([
-                    f"File: {args.file_path}",
-                    f"Type: {result.file_type}",
-                    f"OCR Used: {result.ocr_used}",
-                    f"Pages: {len(result.pages)}",
-                    "-" * 40,
-                ])
+                output_lines.extend(
+                    [
+                        f"File: {args.file_path}",
+                        f"Type: {result.file_type}",
+                        f"OCR Used: {result.ocr_used}",
+                        f"Pages: {len(result.pages)}",
+                        "-" * 40,
+                    ]
+                )
             output_lines.append(result.text)
             output_text = "\n".join(output_lines)
 
@@ -115,6 +117,7 @@ Examples:
         print(f"Error: Unexpected error occurred: {e}", file=sys.stderr)
         if args.verbose:
             import traceback
+
             traceback.print_exc()
         return 1
 

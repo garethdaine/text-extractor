@@ -26,9 +26,7 @@ def parse(file_path: str) -> ExtractedText:
             try:
                 text = pytesseract.image_to_string(image)
             except Exception as exc:  # pragma: no cover - OCR failures are rare
-                raise RuntimeError(
-                    f"Failed to OCR image: {file_path}"
-                ) from exc
+                raise RuntimeError(f"Failed to OCR image: {file_path}") from exc
     except FileNotFoundError as e:
         raise FileNotFoundError(f"Image file not found: {file_path}") from e
     except Exception as exc:  # pragma: no cover - file read failures are rare

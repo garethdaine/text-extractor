@@ -1,17 +1,14 @@
 """Tests for plugin registry functionality."""
 
-import pytest
-import tempfile
 import os
-from pathlib import Path
+import tempfile
 
+from text_extractor.models import ExtractedText, PageText
 from text_extractor.plugin_registry import (
     PluginRegistry,
     get_plugin_registry,
     register_sync_parser,
-    register_async_parser,
 )
-from text_extractor.models import ExtractedText, PageText
 
 
 class TestPluginRegistry:
@@ -25,14 +22,14 @@ class TestPluginRegistry:
             return ExtractedText(
                 text="Test content",
                 file_type="test",
-                pages=[PageText(page_number=1, text="Test content", ocr=False)]
+                pages=[PageText(page_number=1, text="Test content", ocr=False)],
             )
 
         registry.register_sync_parser(
             file_type="test",
             parser=test_parser,
             extensions=[".test"],
-            mime_types=["application/test"]
+            mime_types=["application/test"],
         )
 
         # Test that parser is registered
@@ -55,14 +52,14 @@ class TestPluginRegistry:
             return ExtractedText(
                 text="Test content",
                 file_type="test",
-                pages=[PageText(page_number=1, text="Test content", ocr=False)]
+                pages=[PageText(page_number=1, text="Test content", ocr=False)],
             )
 
         registry.register_async_parser(
             file_type="test",
             parser=test_async_parser,
             extensions=[".test"],
-            mime_types=["application/test"]
+            mime_types=["application/test"],
         )
 
         # Test that parser is registered
@@ -77,14 +74,14 @@ class TestPluginRegistry:
             return ExtractedText(
                 text="Test content",
                 file_type="test",
-                pages=[PageText(page_number=1, text="Test content", ocr=False)]
+                pages=[PageText(page_number=1, text="Test content", ocr=False)],
             )
 
         registry.register_sync_parser(
             file_type="test",
             parser=test_parser,
             extensions=[".test"],
-            mime_types=["application/test"]
+            mime_types=["application/test"],
         )
 
         parsers = registry.list_registered_parsers()
@@ -94,19 +91,16 @@ class TestPluginRegistry:
 
     def test_global_registry(self):
         """Test global registry functions."""
+
         def test_parser(file_path: str) -> ExtractedText:
             return ExtractedText(
                 text="Test content",
                 file_type="test",
-                pages=[PageText(page_number=1, text="Test content", ocr=False)]
+                pages=[PageText(page_number=1, text="Test content", ocr=False)],
             )
 
         # Test global registration
-        register_sync_parser(
-            file_type="test",
-            parser=test_parser,
-            extensions=[".test"]
-        )
+        register_sync_parser(file_type="test", parser=test_parser, extensions=[".test"])
 
         registry = get_plugin_registry()
         parser = registry.get_sync_parser("test")
@@ -117,8 +111,9 @@ class TestPluginRegistry:
         registry = PluginRegistry()
 
         # Create a temporary plugin file
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
-            f.write('''
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
+            f.write(
+                """
 from text_extractor.models import ExtractedText, PageText
 
 def test_parser(file_path: str) -> ExtractedText:
@@ -134,7 +129,8 @@ def register_parsers(registry):
         parser=test_parser,
         extensions=[".plugin"]
     )
-''')
+"""
+            )
             plugin_path = f.name
 
         try:
@@ -162,8 +158,9 @@ def register_parsers(registry):
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create plugin files
             plugin1_path = os.path.join(temp_dir, "plugin1.py")
-            with open(plugin1_path, 'w') as f:
-                f.write('''
+            with open(plugin1_path, "w") as f:
+                f.write(
+                    """
 from text_extractor.models import ExtractedText, PageText
 
 def test_parser1(file_path: str) -> ExtractedText:
@@ -179,11 +176,13 @@ def register_parsers(registry):
         parser=test_parser1,
         extensions=[".plugin1"]
     )
-''')
+"""
+                )
 
             plugin2_path = os.path.join(temp_dir, "plugin2.py")
-            with open(plugin2_path, 'w') as f:
-                f.write('''
+            with open(plugin2_path, "w") as f:
+                f.write(
+                    """
 from text_extractor.models import ExtractedText, PageText
 
 def test_parser2(file_path: str) -> ExtractedText:
@@ -199,16 +198,19 @@ def register_parsers(registry):
         parser=test_parser2,
         extensions=[".plugin2"]
     )
-''')
+"""
+                )
 
             # Create an invalid plugin file
             invalid_path = os.path.join(temp_dir, "invalid.py")
-            with open(invalid_path, 'w') as f:
-                f.write('''
+            with open(invalid_path, "w") as f:
+                f.write(
+                    """
 # This plugin doesn't have a register_parsers function
 def some_function():
     pass
-''')
+"""
+                )
 
             # Test loading plugins from directory
             loaded_count = registry.load_plugin_from_directory(temp_dir)

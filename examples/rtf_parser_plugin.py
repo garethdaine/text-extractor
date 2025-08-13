@@ -22,7 +22,7 @@ def parse_rtf(file_path: str) -> ExtractedText:
     ExtractedText
         Structured text extracted from the RTF file.
     """
-    with open(file_path, 'r', encoding='utf-8', errors='ignore') as file:
+    with open(file_path, encoding="utf-8", errors="ignore") as file:
         content = file.read()
 
     # Simple RTF markup removal (this is a basic implementation)
@@ -30,12 +30,12 @@ def parse_rtf(file_path: str) -> ExtractedText:
     import re
 
     # Remove RTF control words and braces
-    text = re.sub(r'\\[a-z]+\d*', '', content)
-    text = re.sub(r'[{}]', '', text)
-    text = re.sub(r'\\\'[0-9a-f]{2}', '', text)  # Remove hex codes
+    text = re.sub(r"\\[a-z]+\d*", "", content)
+    text = re.sub(r"[{}]", "", text)
+    text = re.sub(r"\\\'[0-9a-f]{2}", "", text)  # Remove hex codes
 
     # Clean up whitespace
-    text = re.sub(r'\s+', ' ', text).strip()
+    text = re.sub(r"\s+", " ", text).strip()
 
     pages = [PageText(page_number=1, text=text, ocr=False)]
     return ExtractedText(text=text, file_type="rtf", pages=pages)
@@ -73,12 +73,12 @@ def register_parsers(registry):
         file_type="rtf",
         parser=parse_rtf,
         extensions=[".rtf"],
-        mime_types=["application/rtf", "text/rtf"]
+        mime_types=["application/rtf", "text/rtf"],
     )
 
     registry.register_async_parser(
         file_type="rtf",
         parser=parse_rtf_async,
         extensions=[".rtf"],
-        mime_types=["application/rtf", "text/rtf"]
+        mime_types=["application/rtf", "text/rtf"],
     )

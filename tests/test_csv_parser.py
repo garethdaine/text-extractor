@@ -1,6 +1,5 @@
 """Tests for CSV file parser."""
 
-
 import pytest
 
 from text_extractor.models import ExtractedText

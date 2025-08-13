@@ -1,7 +1,7 @@
 """Language detection module for extracted text."""
 
-from typing import Optional, Tuple
 from dataclasses import dataclass
+from typing import Optional
 
 
 @dataclass
@@ -35,7 +35,7 @@ def detect_language(text: str, min_confidence: float = 0.8) -> Optional[Language
     >>> print(f"Language: {result.language}, Confidence: {result.confidence}")
     """
     try:
-        from langdetect import detect, detect_langs, DetectorFactory
+        from langdetect import DetectorFactory, detect, detect_langs
         from langdetect.lang_detect_exception import LangDetectException
 
         # Set seed for reproducible results
@@ -62,7 +62,7 @@ def detect_language(text: str, min_confidence: float = 0.8) -> Optional[Language
         return LanguageInfo(
             language=primary_lang,
             confidence=primary_confidence,
-            is_reliable=is_reliable
+            is_reliable=is_reliable,
         )
 
     except (ImportError, LangDetectException):
@@ -101,7 +101,7 @@ def is_english(text: str) -> bool:
         True if the text is detected as English, False otherwise.
     """
     result = detect_language(text)
-    return result is not None and result.language == 'en' and result.is_reliable
+    return result is not None and result.language == "en" and result.is_reliable
 
 
 def get_supported_languages() -> list[str]:
@@ -113,9 +113,59 @@ def get_supported_languages() -> list[str]:
         List of supported language codes.
     """
     return [
-        'af', 'ar', 'bg', 'bn', 'ca', 'cs', 'cy', 'da', 'de', 'el', 'en', 'es', 'et',
-        'fa', 'fi', 'fr', 'gu', 'he', 'hi', 'hr', 'hu', 'id', 'it', 'ja', 'kn', 'ko',
-        'lt', 'lv', 'mk', 'ml', 'mr', 'ne', 'nl', 'no', 'pa', 'pl', 'pt', 'ro', 'ru',
-        'sk', 'sl', 'so', 'sq', 'sv', 'sw', 'ta', 'te', 'th', 'tl', 'tr', 'uk', 'ur',
-        'vi', 'zh-cn', 'zh-tw'
+        "af",
+        "ar",
+        "bg",
+        "bn",
+        "ca",
+        "cs",
+        "cy",
+        "da",
+        "de",
+        "el",
+        "en",
+        "es",
+        "et",
+        "fa",
+        "fi",
+        "fr",
+        "gu",
+        "he",
+        "hi",
+        "hr",
+        "hu",
+        "id",
+        "it",
+        "ja",
+        "kn",
+        "ko",
+        "lt",
+        "lv",
+        "mk",
+        "ml",
+        "mr",
+        "ne",
+        "nl",
+        "no",
+        "pa",
+        "pl",
+        "pt",
+        "ro",
+        "ru",
+        "sk",
+        "sl",
+        "so",
+        "sq",
+        "sv",
+        "sw",
+        "ta",
+        "te",
+        "th",
+        "tl",
+        "tr",
+        "uk",
+        "ur",
+        "vi",
+        "zh-cn",
+        "zh-tw",
     ]

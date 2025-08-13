@@ -2,8 +2,7 @@
 Unit tests for text-extractor models.
 """
 
-import pytest
-from text_extractor.models import PageText, ExtractedText
+from text_extractor.models import ExtractedText, PageText
 
 
 class TestPageText:
@@ -11,11 +10,7 @@ class TestPageText:
 
     def test_valid_page_text(self):
         """Test creating valid PageText."""
-        page = PageText(
-            page_number=1,
-            text="Test content",
-            ocr=False
-        )
+        page = PageText(page_number=1, text="Test content", ocr=False)
         assert page.page_number == 1
         assert page.text == "Test content"
         assert page.ocr is False
@@ -27,11 +22,7 @@ class TestPageText:
 
     def test_page_text_with_ocr(self):
         """Test PageText with OCR enabled."""
-        page = PageText(
-            page_number=2,
-            text="OCR extracted content",
-            ocr=True
-        )
+        page = PageText(page_number=2, text="OCR extracted content", ocr=True)
         assert page.page_number == 2
         assert page.text == "OCR extracted content"
         assert page.ocr is True
@@ -43,10 +34,7 @@ class TestExtractedText:
     def test_valid_extracted_text(self):
         """Test creating valid ExtractedText."""
         extracted = ExtractedText(
-            text="Test content",
-            file_type="pdf",
-            ocr_used=False,
-            pages=[]
+            text="Test content", file_type="pdf", ocr_used=False, pages=[]
         )
         assert extracted.text == "Test content"
         assert extracted.file_type == "pdf"
@@ -65,13 +53,10 @@ class TestExtractedText:
         """Test ExtractedText with pages."""
         pages = [
             PageText(page_number=1, text="Page 1 content"),
-            PageText(page_number=2, text="Page 2 content", ocr=True)
+            PageText(page_number=2, text="Page 2 content", ocr=True),
         ]
         extracted = ExtractedText(
-            text="Combined content",
-            file_type="pdf",
-            ocr_used=True,
-            pages=pages
+            text="Combined content", file_type="pdf", ocr_used=True, pages=pages
         )
         assert extracted.text == "Combined content"
         assert extracted.file_type == "pdf"
@@ -86,19 +71,13 @@ class TestExtractedText:
 
     def test_extracted_text_empty_pages(self):
         """Test ExtractedText with empty pages list."""
-        extracted = ExtractedText(
-            text="Test content",
-            file_type="txt",
-            pages=[]
-        )
+        extracted = ExtractedText(text="Test content", file_type="txt", pages=[])
         assert extracted.pages == []
 
     def test_extracted_text_with_ocr(self):
         """Test ExtractedText with OCR used."""
         extracted = ExtractedText(
-            text="OCR extracted content",
-            file_type="pdf",
-            ocr_used=True
+            text="OCR extracted content", file_type="pdf", ocr_used=True
         )
         assert extracted.text == "OCR extracted content"
         assert extracted.file_type == "pdf"

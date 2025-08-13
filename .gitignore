@@ -172,9 +172,7 @@ Thumbs.db
 ehthumbs.db
 Desktop.ini
 
-# AI Summary Generator specific
-config.yaml
-.env.local
+# Logs and temporary files
 *.log
 logs/
 cache/

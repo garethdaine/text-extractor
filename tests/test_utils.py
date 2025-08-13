@@ -1,6 +1,5 @@
 """Tests for utility functions."""
 
-
 import pytest
 
 from text_extractor.utils import (

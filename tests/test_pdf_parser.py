@@ -1,6 +1,5 @@
 """Tests for PDF file parser."""
 
-
 import pytest
 
 from text_extractor.models import ExtractedText
@@ -123,7 +122,8 @@ class TestPdfParser:
         img_file = tmp_path / "test.png"
         try:
             from PIL import Image as PILImage
-            img = PILImage.new('RGB', (100, 100), color='white')
+
+            img = PILImage.new("RGB", (100, 100), color="white")
             img.save(str(img_file))
         except ImportError:
             pytest.skip("Pillow not available")
