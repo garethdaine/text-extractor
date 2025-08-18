@@ -1,0 +1,385 @@
+# Text Extraction Project-Specific Patterns
+
+## Parser Implementation Standards
+
+### Unified Parser Interface
+All parsers (both sync and async) must follow the unified interface pattern:
+
+```python
+# Synchronous parser interface
+def parse(file_path: str) -> ExtractedText:
+    """Parse a file and return extracted text with metadata.
+
+    Parameters
+    ----------
+    file_path : str
+        Path to the file to parse.
+
+    Returns
+    -------
+    ExtractedText
+        Structured extraction results with text, file type, OCR status, and pages.
+    """
+
+# Asynchronous parser interface
+async def parse(file_path: str) -> ExtractedText:
+    """Async parse a file and return extracted text with metadata."""
+```
+
+### Parser Structure Requirements
+Every parser must:
+1. **Validate file existence** before processing
+2. **Handle encoding detection** for text-based formats
+3. **Return structured ExtractedText** with all required fields
+4. **Set OCR flag correctly** when OCR is used
+5. **Provide page-level breakdown** in the pages field
+6. **Handle errors gracefully** with meaningful messages
+
+```python
+def parse(file_path: str) -> ExtractedText:
+    # 1. Validate file existence
+    if not Path(file_path).exists():
+        raise FileNotFoundError(f"File not found: {file_path}")
+
+    try:
+        # 2. Parse content (format-specific logic)
+        content = _extract_content(file_path)
+
+        # 3. Create page breakdown
+        pages = _create_page_breakdown(content)
+
+        # 4. Return structured result
+        return ExtractedText(
+            text=content,
+            file_type="format_name",
+            ocr_used=False,  # Set appropriately
+            pages=pages
+        )
+    except Exception as e:
+        raise ValueError(f"Failed to parse {file_path}: {str(e)}") from e
+```
+
+### OCR Integration Patterns
+For parsers that may need OCR fallback:
+
+```python
+def parse(file_path: str) -> ExtractedText:
+    # Try native parsing first
+    try:
+        native_text = _extract_native_text(file_path)
+        if native_text.strip():  # Has extractable text
+            return ExtractedText(
+                text=native_text,
+                file_type="pdf",
+                ocr_used=False,
+                pages=_create_pages(native_text, ocr=False)
+            )
+    except Exception:
+        pass  # Fall through to OCR
+
+    # Fallback to OCR
+    ocr_text = _extract_with_ocr(file_path)
+    return ExtractedText(
+        text=ocr_text,
+        file_type="pdf",
+        ocr_used=True,
+        pages=_create_pages(ocr_text, ocr=True)
+    )
+```
+
+## Async Implementation Patterns
+
+### Async Parser Structure
+Async parsers should use `asyncio` for I/O operations:
+
+```python
+async def parse(file_path: str) -> ExtractedText:
+    """Async parser implementation."""
+    # Use async file operations
+    async with aiofiles.open(file_path, 'r') as f:
+        content = await f.read()
+
+    # CPU-bound operations can run in thread pool
+    loop = asyncio.get_event_loop()
+    processed_content = await loop.run_in_executor(
+        None, _process_content, content
+    )
+
+    return ExtractedText(
+        text=processed_content,
+        file_type="format",
+        pages=_create_pages(processed_content)
+    )
+```
+
+### Async Error Handling
+```python
+async def parse(file_path: str) -> ExtractedText:
+    try:
+        return await _async_parse_implementation(file_path)
+    except asyncio.CancelledError:
+        # Handle cancellation properly
+        raise
+    except Exception as e:
+        # Convert to appropriate exception type
+        raise ValueError(f"Async parsing failed for {file_path}") from e
+```
+
+## Plugin Development Standards
+
+### Plugin File Structure
+Plugin files must follow this structure:
+
+```python
+# my_parser_plugin.py
+from text_extractor.models import ExtractedText, PageText
+
+def parse_my_format(file_path: str) -> ExtractedText:
+    """Synchronous parser for my custom format."""
+    # Implementation here
+    pass
+
+async def parse_my_format_async(file_path: str) -> ExtractedText:
+    """Asynchronous parser for my custom format."""
+    # Implementation here
+    pass
+
+def register_parsers(registry):
+    """Register parsers with the plugin registry.
+
+    This function is called automatically when the plugin is loaded.
+    """
+    # Register sync parser
+    registry.register_sync_parser(
+        file_type="myformat",
+        parser=parse_my_format,
+        extensions=[".myf", ".custom"],
+        mime_types=["application/myformat"]
+    )
+
+    # Register async parser
+    registry.register_async_parser(
+        file_type="myformat",
+        parser=parse_my_format_async,
+        extensions=[".myf", ".custom"],
+        mime_types=["application/myformat"]
+    )
+```
+
+### Plugin Testing Requirements
+Every plugin should include comprehensive tests:
+
+```python
+# test_my_parser_plugin.py
+def test_plugin_registration():
+    """Test that plugin registers correctly."""
+    registry = PluginRegistry()
+    register_parsers(registry)
+
+    assert registry.get_sync_parser("myformat") is not None
+    assert registry.get_async_parser("myformat") is not None
+
+def test_plugin_parsing(tmp_path):
+    """Test actual parsing functionality."""
+    # Create test file
+    test_file = tmp_path / "test.myf"
+    test_file.write_text("test content")
+
+    # Test parsing
+    result = parse_my_format(str(test_file))
+    assert isinstance(result, ExtractedText)
+    assert result.text == "expected content"
+    assert result.file_type == "myformat"
+```
+
+## Language Detection Integration
+
+### When to Use Language Detection
+- **Always** after text extraction for user-facing features
+- **Optional** for internal processing optimization
+- **Required** when language affects parsing logic
+
+```python
+def parse_with_language_detection(file_path: str) -> ExtractedText:
+    # Extract text first
+    result = _basic_parse(file_path)
+
+    # Add language detection
+    if result.text.strip():
+        lang_info = detect_language(result.text)
+        if lang_info:
+            # Could store language info in metadata
+            # or use for processing decisions
+            pass
+
+    return result
+```
+
+## Error Handling Patterns
+
+### Standard Error Types
+Use these exception types consistently:
+
+- `FileNotFoundError` - File doesn't exist
+- `ValueError` - Unsupported format or parsing error
+- `RuntimeError` - System-level errors (OCR not available, etc.)
+- `asyncio.CancelledError` - Async operation cancelled (don't catch this)
+
+### Error Message Standards
+```python
+# Good error messages
+raise FileNotFoundError(f"File not found: {file_path}")
+raise ValueError(f"No parser available for file type: {file_type}")
+raise ValueError(f"Failed to parse PDF {file_path}: {str(original_error)}")
+
+# Bad error messages
+raise Exception("Error")
+raise ValueError("Parsing failed")
+raise RuntimeError("Something went wrong")
+```
+
+## Performance Optimization Patterns
+
+### File Size Considerations
+```python
+def parse_with_size_check(file_path: str) -> ExtractedText:
+    file_size = Path(file_path).stat().st_size
+
+    # Different strategies for different file sizes
+    if file_size > 100_000_000:  # >100MB
+        # Use streaming or chunked processing
+        return _parse_large_file(file_path)
+    else:
+        # Standard processing
+        return _parse_normal_file(file_path)
+```
+
+### Memory Management
+```python
+def parse_memory_efficient(file_path: str) -> ExtractedText:
+    """Parse file with memory efficiency in mind."""
+    pages = []
+
+    # Process page by page instead of loading entire document
+    for page_num, page_content in _iterate_pages(file_path):
+        pages.append(PageText(
+            page_number=page_num,
+            text=page_content,
+            ocr=False
+        ))
+
+    # Combine pages efficiently
+    full_text = "\n".join(page.text for page in pages)
+
+    return ExtractedText(
+        text=full_text,
+        file_type="format",
+        pages=pages
+    )
+```
+
+## Testing Patterns for Parsers
+
+### Parser Test Structure
+```python
+class TestMyParser:
+    def test_parse_valid_file_returns_extracted_text(self, sample_file):
+        # Arrange
+        expected_content = "expected file content"
+
+        # Act
+        result = my_parser.parse(sample_file)
+
+        # Assert
+        assert isinstance(result, ExtractedText)
+        assert expected_content in result.text
+        assert result.file_type == "myformat"
+        assert len(result.pages) > 0
+
+    def test_parse_nonexistent_file_raises_error(self):
+        with pytest.raises(FileNotFoundError):
+            my_parser.parse("nonexistent.myf")
+
+    def test_parse_corrupted_file_raises_error(self, corrupted_file):
+        with pytest.raises(ValueError, match="Failed to parse"):
+            my_parser.parse(corrupted_file)
+```
+
+### Async Parser Testing
+```python
+class TestMyAsyncParser:
+    @pytest.mark.asyncio
+    async def test_async_parse_returns_same_result_as_sync(self, sample_file):
+        # Arrange & Act
+        sync_result = my_parser.parse(sample_file)
+        async_result = await my_async_parser.parse(sample_file)
+
+        # Assert - async should match sync
+        assert sync_result.text == async_result.text
+        assert sync_result.file_type == async_result.file_type
+        assert sync_result.ocr_used == async_result.ocr_used
+```
+
+## Integration with Factory Pattern
+
+### Registering New Parsers
+When adding built-in parsers, update the factory:
+
+```python
+# In parser_factory.py
+_PARSERS: dict[str, Parser] = {
+    "pdf": pdf_parser.parse,
+    "docx": docx_parser.parse,
+    "csv": csv_parser.parse,
+    "txt": txt_parser.parse,
+    "png": image_parser.parse,
+    "jpg": image_parser.parse,
+    "webp": image_parser.parse,
+    "myformat": my_parser.parse,  # Add new parser here
+}
+
+# In async_parser_factory.py
+_ASYNC_PARSERS: dict[str, AsyncParser] = {
+    # ... existing parsers
+    "myformat": my_async_parser.parse,  # Add async parser here
+}
+```
+
+## File Type Detection Patterns
+
+### Extension-Based Detection
+```python
+def resolve_file_type(file_path: str) -> str:
+    """Resolve file type from extension."""
+    extension = Path(file_path).suffix.lower()
+
+    type_map = {
+        ".pdf": "pdf",
+        ".docx": "docx",
+        ".csv": "csv",
+        ".txt": "txt",
+        ".png": "png",
+        ".jpg": "jpg",
+        ".jpeg": "jpg",
+        ".webp": "webp",
+        ".myf": "myformat",  # Custom format
+    }
+
+    return type_map.get(extension, "unknown")
+```
+
+### MIME Type Integration
+```python
+def get_mime_type_mapping() -> dict[str, str]:
+    """Map MIME types to internal file types."""
+    return {
+        "application/pdf": "pdf",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "docx",
+        "text/csv": "csv",
+        "text/plain": "txt",
+        "image/png": "png",
+        "image/jpeg": "jpg",
+        "image/webp": "webp",
+        "application/myformat": "myformat",  # Custom MIME type
+    }
+```

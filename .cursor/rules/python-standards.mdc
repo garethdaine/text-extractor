@@ -1,0 +1,166 @@
+# Python Coding Standards
+
+## Type Hints and Annotations
+
+- **ALWAYS** use type hints for all function parameters and return values
+- Use `from typing import` for complex types like `Dict`, `List`, `Optional`, `Union`
+- Use modern Python 3.8+ union syntax `str | None` instead of `Optional[str]` where appropriate
+- For async functions, use `async def` and return type should include `Awaitable` or direct return type
+
+```python
+# Good
+def parse_file(file_path: str, encoding: str | None = None) -> ExtractedText:
+    pass
+
+async def parse_file_async(file_path: str) -> ExtractedText:
+    pass
+
+# Bad
+def parse_file(file_path, encoding=None):
+    pass
+```
+
+## Docstring Standards
+
+- **ALWAYS** include docstrings for all public functions, classes, and modules
+- Use NumPy-style docstrings for consistency with the existing codebase
+- Include Parameters, Returns, Raises sections where applicable
+- Include Examples section for complex functions
+
+```python
+def extract_text_from_file(file_path: str) -> ExtractedText:
+    """Extract text from a file using the appropriate parser.
+
+    This is the main entry point for the text extraction tool. It automatically
+    selects the appropriate parser based on the file extension and returns
+    structured text extraction results.
+
+    Parameters
+    ----------
+    file_path : str
+        Path to the file to extract text from.
+
+    Returns
+    -------
+    ExtractedText
+        Structured text extraction results containing the extracted text,
+        file type information, OCR usage, and page-level details.
+
+    Raises
+    ------
+    FileNotFoundError
+        If the specified file does not exist.
+    ValueError
+        If the file type is not supported.
+
+    Examples
+    --------
+    >>> result = extract_text_from_file("document.pdf")
+    >>> print(result.text)
+    """
+```
+
+## Code Formatting and Style
+
+- **ALWAYS** use Black for code formatting with 88 character line length
+- **ALWAYS** use Ruff for linting with the configured rules in pyproject.toml
+- Follow PEP 8 naming conventions:
+  - Functions and variables: `snake_case`
+  - Classes: `PascalCase`
+  - Constants: `UPPER_CASE`
+  - Private attributes: `_leading_underscore`
+
+## Import Organization
+
+- Group imports in this order:
+  1. Standard library imports
+  2. Third-party imports
+  3. Local application imports
+- Use absolute imports for local modules
+- Sort imports alphabetically within each group
+- Use `from typing import` for type hints
+
+```python
+# Standard library
+import asyncio
+import sys
+from pathlib import Path
+from typing import Dict, List, Optional
+
+# Third-party
+import pandas as pd
+from PIL import Image
+
+# Local
+from text_extractor.models import ExtractedText, PageText
+from text_extractor.utils import resolve_file_type
+```
+
+## Error Handling
+
+- Use specific exception types rather than generic `Exception`
+- Always include meaningful error messages
+- Use `raise ... from exc` to preserve exception chains
+- Document all exceptions in function docstrings
+
+```python
+# Good
+try:
+    return _PARSERS[file_type]
+except KeyError as exc:
+    raise ValueError(f"No parser available for file type: {file_type}") from exc
+
+# Bad
+try:
+    return _PARSERS[file_type]
+except:
+    raise Exception("Parser not found")
+```
+
+## Dataclasses and Models
+
+- Use `@dataclass` for simple data containers
+- Include type hints for all fields
+- Use `frozen=True` for immutable data
+- Provide default values where appropriate
+
+```python
+@dataclass
+class ExtractedText:
+    text: str
+    file_type: str
+    ocr_used: bool = False
+    pages: List[PageText] = field(default_factory=list)
+```
+
+## Async/Await Patterns
+
+- Use `async def` for all async functions
+- Always `await` async function calls
+- Use `asyncio.gather()` for concurrent operations
+- Handle exceptions properly in async contexts
+
+```python
+async def process_multiple_files(file_paths: List[str]) -> List[ExtractedText]:
+    tasks = [extract_text_from_file_async(path) for path in file_paths]
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+    return [r for r in results if not isinstance(r, Exception)]
+```
+
+## Comments
+
+- Write comments for complex business logic, not obvious code
+- Use inline comments sparingly and only when necessary
+- Prefer self-documenting code with clear variable and function names
+- Use TODO comments with context for future improvements
+
+```python
+# Good - explains why, not what
+# Use OCR fallback for PDFs with no extractable text
+if not extracted_text.strip():
+    return await _extract_with_ocr(file_path)
+
+# Bad - explains obvious code
+# Set the file type to pdf
+file_type = "pdf"
+```

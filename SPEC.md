@@ -51,31 +51,49 @@ Example output:
 
 ---
 
-## 🔐 Security & Scope
+## 🔧 Additional Features
 
-- All actions are **user-scoped** using Supabase RLS
-- Uploaded files are private by default
-- Extracted text is not exposed outside the authenticated session
+### Async Processing
+- Non-blocking text extraction with `extract_text_from_file_async()`
+- Concurrent processing of multiple documents
+- Full async parser implementations for all supported formats
+
+### Language Detection
+- Automatic language detection with confidence scoring
+- Support for 55+ languages
+- Simple language checks and utilities
+
+### Plugin System
+- Extensible architecture for custom parsers
+- Dynamic loading of parser plugins from files and directories
+- Support for both synchronous and asynchronous custom parsers
 
 ---
 
 ## 🧰 Dependencies
 
-- `pdfminer.six`
-- `python-docx`
-- `pandas`
-- `pytesseract`
-- `pdf2image`
-- `PIL` (Pillow)
-- `uuid`, `json`, `datetime`, `typing`
+### Core Dependencies
+- `pdfminer.six>=20221105` - PDF text extraction
+- `python-docx>=0.8.11` - DOCX document parsing
+- `pandas>=1.5.0` - CSV data processing
+- `pytesseract>=0.3.10` - OCR text recognition
+- `pdf2image>=1.16.0` - PDF to image conversion
+- `Pillow>=9.0.0` - Image processing
+- `chardet>=5.0.0` - Character encoding detection
+
+### Optional Dependencies
+- `langdetect>=1.0.9` - Language detection capabilities
 
 ---
 
-## 🚧 Future Considerations
+## ✅ Implemented Enhancements
 
-- Add support for multi-language OCR
-- Perform automatic language detection
-- Introduce async batch extraction for large files
+- ✅ Multi-language OCR support via Tesseract
+- ✅ Automatic language detection with confidence scoring
+- ✅ Async batch extraction for concurrent processing
+- ✅ Plugin system for custom parser extensions
+- ✅ Command-line interface with multiple output formats
+- ✅ Comprehensive error handling and edge case coverage
 
 ## 🧩 Design Principles
 

@@ -1,0 +1,247 @@
+# Testing Standards and Practices
+
+## Test Organization and Structure
+
+- **ALWAYS** use pytest as the testing framework
+- Organize tests in the `tests/` directory mirroring the source structure
+- Use descriptive test file names: `test_<module_name>.py`
+- Create separate edge case test files: `test_<module_name>_edge_cases.py`
+- Group related tests in test classes using `Test<FeatureName>` naming
+
+```python
+# Good structure
+tests/
+├── test_pdf_parser.py           # Main functionality tests
+├── test_pdf_parser_edge_cases.py # Edge cases and error conditions
+├── test_async_parsers.py        # Async functionality tests
+└── fixtures/                    # Test data files
+    ├── sample.pdf
+    └── sample.txt
+```
+
+## Test Method Naming and Organization
+
+- Use descriptive test method names: `test_<what_is_being_tested>`
+- Structure tests using **Arrange-Act-Assert** pattern
+- Use meaningful variable names in tests for better failure debugging
+- Group assertions logically and add descriptive failure messages
+
+```python
+class TestPdfParser:
+    def test_parse_valid_pdf_returns_extracted_text(self):
+        # Arrange
+        pdf_path = "tests/fixtures/sample.pdf"
+        expected_text_content = "Sample PDF content"
+
+        # Act
+        result = pdf_parser.parse(pdf_path)
+
+        # Assert
+        assert isinstance(result, ExtractedText)
+        assert expected_text_content in result.text
+        assert result.file_type == "pdf"
+        assert not result.ocr_used  # Native PDF parsing
+        assert len(result.pages) > 0
+```
+
+## Test Coverage Requirements
+
+- **ALWAYS** aim for high test coverage (>80%) for core functionality
+- **MUST** test all public APIs and entry points
+- **MUST** test error conditions and edge cases
+- Use `pytest-cov` for coverage reporting
+- Run coverage with: `pytest --cov=text_extractor --cov-report=term-missing`
+
+```bash
+# Required coverage check
+pytest --cov=text_extractor --cov-report=term-missing --cov-fail-under=80
+```
+
+## Async Testing Standards
+
+- Use `pytest-asyncio` for testing async functionality
+- Mark async tests with `@pytest.mark.asyncio`
+- Test both successful async operations and error conditions
+- Use `asyncio.gather()` to test concurrent operations
+
+```python
+import pytest
+
+class TestAsyncParsers:
+    @pytest.mark.asyncio
+    async def test_extract_text_from_file_async_returns_result(self):
+        # Arrange
+        file_path = "tests/fixtures/sample.txt"
+
+        # Act
+        result = await extract_text_from_file_async(file_path)
+
+        # Assert
+        assert isinstance(result, ExtractedText)
+        assert result.text.strip()
+        assert result.file_type == "txt"
+
+    @pytest.mark.asyncio
+    async def test_concurrent_async_parsing(self):
+        # Arrange
+        file_paths = ["tests/fixtures/sample.txt", "tests/fixtures/sample.csv"]
+
+        # Act
+        tasks = [extract_text_from_file_async(path) for path in file_paths]
+        results = await asyncio.gather(*tasks)
+
+        # Assert
+        assert len(results) == 2
+        assert all(isinstance(r, ExtractedText) for r in results)
+```
+
+## Fixtures and Test Data
+
+- Store test data in `tests/fixtures/` directory
+- Use `pytest.fixture` for reusable test setup
+- Create realistic test data that represents actual use cases
+- Use `tmp_path` fixture for temporary file operations
+
+```python
+@pytest.fixture
+def sample_pdf_path():
+    """Path to a sample PDF file for testing."""
+    return Path("tests/fixtures/sample.pdf")
+
+@pytest.fixture
+def temp_text_file(tmp_path):
+    """Create a temporary text file for testing."""
+    content = "This is a test file\nwith multiple lines."
+    file_path = tmp_path / "test.txt"
+    file_path.write_text(content)
+    return str(file_path)
+```
+
+## Error and Edge Case Testing
+
+- **ALWAYS** test error conditions and exceptions
+- Test file not found scenarios
+- Test unsupported file types
+- Test corrupted or malformed files
+- Test empty files and edge cases
+- Use `pytest.raises()` for exception testing
+
+```python
+def test_extract_text_from_nonexistent_file_raises_error(self):
+    # Arrange
+    nonexistent_path = "does_not_exist.pdf"
+
+    # Act & Assert
+    with pytest.raises(FileNotFoundError):
+        extract_text_from_file(nonexistent_path)
+
+def test_extract_text_from_unsupported_file_raises_error(self):
+    # Arrange
+    unsupported_path = "tests/fixtures/unsupported.xyz"
+
+    # Act & Assert
+    with pytest.raises(ValueError, match="No parser available"):
+        extract_text_from_file(unsupported_path)
+```
+
+## Plugin System Testing
+
+- Test plugin registration and loading
+- Test custom parser integration
+- Use temporary files for plugin testing
+- Test both sync and async plugin parsers
+
+```python
+def test_plugin_registration_and_usage(tmp_path):
+    # Arrange
+    plugin_content = '''
+def parse_custom(file_path: str) -> ExtractedText:
+    return ExtractedText(text="custom", file_type="custom")
+
+def register_parsers(registry):
+    registry.register_sync_parser("custom", parse_custom, [".custom"])
+    '''
+    plugin_file = tmp_path / "test_plugin.py"
+    plugin_file.write_text(plugin_content)
+
+    # Act
+    registry = get_plugin_registry()
+    success = registry.load_plugin_from_file(str(plugin_file))
+
+    # Assert
+    assert success
+    assert registry.get_sync_parser("custom") is not None
+```
+
+## Performance Testing
+
+- Add performance markers for slow tests
+- Use `@pytest.mark.slow` for tests that take >1 second
+- Test async performance with concurrent operations
+- Skip slow tests in regular development: `pytest -m "not slow"`
+
+```python
+@pytest.mark.slow
+def test_large_pdf_processing_performance(large_pdf_fixture):
+    # Arrange
+    start_time = time.time()
+
+    # Act
+    result = extract_text_from_file(large_pdf_fixture)
+    processing_time = time.time() - start_time
+
+    # Assert
+    assert result.text
+    assert processing_time < 30  # Should complete within 30 seconds
+```
+
+## Test Execution Commands
+
+Run these commands as part of your testing workflow:
+
+```bash
+# Run all tests
+pytest
+
+# Run with coverage
+pytest --cov=text_extractor --cov-report=html
+
+# Run only fast tests (exclude slow tests)
+pytest -m "not slow"
+
+# Run specific test file
+pytest tests/test_pdf_parser.py
+
+# Run with verbose output
+pytest -v
+
+# Run tests and stop on first failure
+pytest -x
+```
+
+## Test Markers Configuration
+
+Use these pytest markers defined in `pyproject.toml`:
+
+- `@pytest.mark.slow` - Tests that take >1 second
+- `@pytest.mark.integration` - Integration tests
+- `@pytest.mark.unit` - Unit tests
+
+## Before Committing Tests
+
+**ALWAYS** run this complete test suite before committing:
+
+```bash
+# 1. Run linting
+ruff check .
+black --check .
+
+# 2. Run all tests with coverage
+pytest --cov=text_extractor --cov-report=term-missing
+
+# 3. Run type checking (if mypy is configured)
+mypy text_extractor/
+
+# 4. Verify no linting errors
+ruff check . --fix
+```

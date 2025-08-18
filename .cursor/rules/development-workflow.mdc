@@ -1,0 +1,241 @@
+# Development Workflow Standards
+
+## Pre-Commit Requirements
+
+**BEFORE EVERY COMMIT** you must run this complete workflow:
+
+### 1. Code Quality Checks
+```bash
+# Format code with Black
+black .
+
+# Run Ruff linting with auto-fixes
+ruff check . --fix
+
+# Check for any remaining linting issues
+ruff check .
+```
+
+### 2. Type Checking
+```bash
+# Run mypy for type checking (if configured)
+mypy text_extractor/
+```
+
+### 3. Test Suite Execution
+```bash
+# Run full test suite with coverage
+pytest --cov=text_extractor --cov-report=term-missing
+
+# Ensure all tests pass
+pytest --tb=short -q
+
+# Verify test count matches documentation (currently 211 tests)
+pytest --collect-only -q | tail -1
+```
+
+### 4. Documentation Verification
+- **ALWAYS** update relevant documentation after code changes
+- Verify docstrings are complete for new/modified functions
+- Update README.md if public API changes
+- Update ARCHITECTURE.md if module structure changes
+- Update SPEC.md if new features are added
+
+## Git Workflow Standards
+
+### Branch Naming
+- Use descriptive branch names: `feature/add-rtf-parser`, `fix/pdf-ocr-fallback`, `docs/update-api-docs`
+- Use prefixes: `feature/`, `fix/`, `docs/`, `refactor/`, `test/`
+
+### Commit Message Standards
+- Use conventional commit format: `type(scope): description`
+- Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
+- Keep first line under 50 characters
+- Include detailed description for complex changes
+
+```bash
+# Good commit messages
+feat(parsers): add RTF parser with plugin support
+fix(pdf): resolve OCR fallback for scanned documents
+docs: update README with new async examples
+test: add edge cases for language detection
+
+# Bad commit messages
+fix bug
+update stuff
+changes
+```
+
+### Pre-Commit Hooks
+The project uses pre-commit hooks defined in `.pre-commit-config.yaml`:
+
+```bash
+# Install pre-commit hooks (one-time setup)
+pre-commit install
+
+# Run pre-commit on all files
+pre-commit run --all-files
+
+# The hooks will automatically run on git commit
+```
+
+## Code Review Standards
+
+### Before Creating a Pull Request
+1. **Run complete test suite**: All 211 tests must pass
+2. **Check code coverage**: Maintain >80% coverage for new code
+3. **Verify linting**: No Ruff or Black formatting issues
+4. **Update documentation**: All relevant docs updated
+5. **Test edge cases**: Add tests for error conditions
+6. **Verify async compatibility**: If adding async features, test both sync and async paths
+
+### Pull Request Checklist
+- [ ] All tests pass (`pytest`)
+- [ ] Code coverage maintained (`pytest --cov=text_extractor`)
+- [ ] Linting clean (`ruff check .`)
+- [ ] Formatting applied (`black .`)
+- [ ] Documentation updated (README.md, ARCHITECTURE.md, etc.)
+- [ ] Docstrings added for new public functions
+- [ ] Edge cases tested
+- [ ] Plugin system compatibility verified (if applicable)
+
+## Release Workflow
+
+### Version Bumping
+- Update version in `pyproject.toml`
+- Update version references in documentation
+- Create git tag with version number
+
+### Documentation Updates for Releases
+When releasing, ensure these files are current:
+- `README.md` - Features, installation, usage examples
+- `ARCHITECTURE.md` - Module structure, components
+- `SPEC.md` - Supported formats, dependencies
+- `AGENTS.md` - AI agent interaction guide
+- `TASKS.md` - Project status and test counts
+
+## Environment Setup Standards
+
+### Development Environment
+```bash
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # or `venv\Scripts\activate` on Windows
+
+# Install development dependencies
+pip install -r requirements.txt
+pip install -e .
+
+# Install pre-commit hooks
+pre-commit install
+
+# Verify setup
+pytest --version
+black --version
+ruff --version
+```
+
+### IDE Configuration
+- Configure your IDE to use Black for formatting (88 character line length)
+- Enable Ruff linting with the project's configuration
+- Set up type checking with mypy
+- Configure pytest as the test runner
+
+## Continuous Integration Standards
+
+### Required CI Checks
+Any CI/CD pipeline should include:
+
+```yaml
+# Example GitHub Actions workflow steps
+- name: Install dependencies
+  run: |
+    pip install -r requirements.txt
+    pip install -e .
+
+- name: Run linting
+  run: |
+    black --check .
+    ruff check .
+
+- name: Run type checking
+  run: mypy text_extractor/
+
+- name: Run tests with coverage
+  run: |
+    pytest --cov=text_extractor --cov-report=xml
+
+- name: Upload coverage
+  uses: codecov/codecov-action@v3
+```
+
+### Supported Python Versions
+- **Minimum**: Python 3.8
+- **Recommended**: Python 3.11+
+- **Testing**: Test against Python 3.8, 3.9, 3.10, 3.11, 3.12
+
+## Performance Standards
+
+### Benchmarking
+- Monitor performance of text extraction operations
+- Set reasonable timeouts for OCR operations
+- Test async performance with concurrent operations
+- Profile memory usage for large documents
+
+### Performance Thresholds
+- PDF parsing: <5 seconds for typical documents
+- OCR operations: <30 seconds for single page images
+- Async operations: Should show measurable performance improvement for multiple files
+
+## Security Standards
+
+### Input Validation
+- **ALWAYS** validate file paths and existence
+- Sanitize user inputs for CLI operations
+- Handle malformed or corrupted files gracefully
+- Set reasonable limits on file sizes
+
+### Dependencies
+- Keep dependencies updated with security patches
+- Use `pip-audit` to check for security vulnerabilities
+- Pin dependency versions in requirements.txt
+
+```bash
+# Check for security vulnerabilities
+pip-audit
+
+# Update dependencies safely
+pip-compile --upgrade requirements.in
+```
+
+## Debugging Standards
+
+### Logging
+- Use Python's `logging` module for debug information
+- Set appropriate log levels
+- Include context in log messages
+- Avoid logging sensitive information
+
+### Error Handling
+- Provide meaningful error messages
+- Include file paths and operation context in errors
+- Use appropriate exception types
+- Preserve exception chains with `raise ... from exc`
+
+## Documentation Standards
+
+### Code Documentation
+- **REQUIRED**: Docstrings for all public functions and classes
+- **REQUIRED**: Type hints for all function parameters and returns
+- **RECOMMENDED**: Inline comments for complex business logic
+- **REQUIRED**: Update documentation when changing public APIs
+
+### Project Documentation
+After any significant changes, verify and update:
+1. **README.md** - Installation, usage, features
+2. **ARCHITECTURE.md** - Module structure, design decisions
+3. **SPEC.md** - Technical specifications, supported formats
+4. **AGENTS.md** - AI coding assistant guidance
+5. **TASKS.md** - Project status, test counts, completion status
+
+**CRITICAL**: Always run the complete test suite and update test counts in documentation after adding/removing tests.

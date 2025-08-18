@@ -1,0 +1,237 @@
+# Documentation Maintenance Standards
+
+## Critical Documentation Update Requirements
+
+**MANDATORY**: After completing ANY task or set of tasks, you MUST update ALL relevant documentation files to maintain accuracy and consistency.
+
+## Documentation Files That Must Stay Current
+
+### 1. README.md
+**Update when:**
+- Adding new features or capabilities
+- Changing installation requirements
+- Modifying public API
+- Updating Python version requirements
+- Changing dependency requirements
+- Adding/removing test cases (update test count)
+
+**Key sections to verify:**
+- ✨ Features list
+- 📦 Installation requirements and Python version
+- 🔧 Usage examples and code samples
+- 🧪 Test coverage numbers (currently 211 tests)
+- 📊 Output schema examples
+
+### 2. ARCHITECTURE.md
+**Update when:**
+- Adding new modules or files
+- Changing directory structure
+- Modifying core components
+- Adding new design patterns
+- Implementing new architectural features
+
+**Key sections to verify:**
+- 📁 Module structure diagram
+- ⚙️ Core components descriptions
+- 🔄 Execution flow diagrams
+- Test file organization
+
+### 3. SPEC.md
+**Update when:**
+- Adding support for new file formats
+- Changing parsing methods or dependencies
+- Adding new features (async, language detection, plugins)
+- Modifying validation criteria
+- Updating dependency versions
+
+**Key sections to verify:**
+- 📂 Supported file types table
+- 🧰 Dependencies list with versions
+- 🔧 Additional features descriptions
+- ✅ Implemented enhancements
+
+### 4. AGENTS.md
+**Update when:**
+- Adding new public APIs
+- Changing usage patterns
+- Adding new features that AI agents should know about
+- Modifying extension mechanisms
+- Updating testing approaches
+
+**Key sections to verify:**
+- 📦 What the module does
+- 📂 Directory structure
+- 🧰 Usage examples
+- 🧩 Extension guidelines
+- 🧪 Testing expectations
+
+### 5. TASKS.md
+**Update when:**
+- Completing project phases
+- Adding/removing test cases (update test count)
+- Changing project status
+- Implementing new features
+
+**Key sections to verify:**
+- ✅ Task completion status
+- 📊 Test results and counts (currently 211 tests)
+- Feature implementation status
+
+## Documentation Accuracy Verification Checklist
+
+Before marking any task as complete, verify these items:
+
+### Test Count Accuracy
+```bash
+# Get actual test count
+pytest --collect-only -q | tail -1
+
+# Update this number in ALL documentation files:
+# - README.md (Test Coverage section)
+# - TASKS.md (Test Results section)
+# - AGENTS.md (Testing Expectations section)
+# - ARCHITECTURE.md (if mentioned)
+```
+
+### Python Version Consistency
+Ensure these files all show the same Python version requirement:
+- `README.md` (Requirements section)
+- `pyproject.toml` (requires-python field)
+- `SPEC.md` (if mentioned)
+
+### Dependency Consistency
+Verify dependency lists match between:
+- `requirements.txt`
+- `pyproject.toml` (dependencies field)
+- `README.md` (Requirements section)
+- `SPEC.md` (Dependencies section)
+
+### Feature Documentation Completeness
+When adding new features, ensure they are documented in:
+- `README.md` (Features list and usage examples)
+- `SPEC.md` (Additional Features section)
+- `ARCHITECTURE.md` (Core Components section)
+- `AGENTS.md` (What This Module Does section)
+
+## Documentation Update Workflow
+
+### Step 1: Identify Impact
+After completing code changes, ask:
+- Did I add/remove/modify public APIs?
+- Did I add/remove test cases?
+- Did I change dependencies?
+- Did I add new features?
+- Did I modify the module structure?
+
+### Step 2: Update Documentation
+For each "yes" answer above, update the relevant documentation files.
+
+### Step 3: Verify Consistency
+Run these checks:
+```bash
+# Check test count matches documentation
+pytest --collect-only -q | tail -1
+
+# Verify no linting errors in documentation
+# (if markdown linting is configured)
+
+# Check that all examples in documentation work
+python -c "from text_extractor import extract_text_from_file; print('API import works')"
+```
+
+### Step 4: Cross-Reference Check
+Ensure information is consistent across all documentation files:
+- Feature lists match between README.md and SPEC.md
+- Module structure matches between ARCHITECTURE.md and actual structure
+- Usage examples work and reflect current API
+
+## Documentation Quality Standards
+
+### Code Examples
+- **ALWAYS** test code examples in documentation
+- Use realistic file paths and data
+- Show both success and error cases
+- Include imports and setup code
+- Keep examples concise but complete
+
+### Version Information
+- **ALWAYS** update version numbers consistently
+- Include version compatibility information
+- Document breaking changes clearly
+- Update changelog/release notes
+
+### Cross-References
+- Link related sections within documents
+- Reference external documentation appropriately
+- Keep links current and working
+- Use consistent terminology across all docs
+
+## Automated Documentation Checks
+
+Consider adding these checks to your workflow:
+
+```bash
+# Check that documentation examples are valid Python
+python -m py_compile examples_from_docs.py
+
+# Verify imports work
+python -c "
+import sys
+sys.path.insert(0, '.')
+from text_extractor import extract_text_from_file, extract_text_from_file_async
+from text_extractor import detect_language, get_plugin_registry
+print('All documented imports work')
+"
+
+# Check test count consistency
+ACTUAL_TESTS=$(pytest --collect-only -q | tail -1 | grep -o '[0-9]\+ tests' | grep -o '[0-9]\+')
+echo "Actual test count: $ACTUAL_TESTS"
+grep -r "$ACTUAL_TESTS tests" *.md || echo "WARNING: Test count may be inconsistent in documentation"
+```
+
+## Documentation Review Checklist
+
+Before considering any development task complete:
+
+- [ ] **README.md updated** with new features, correct test count, accurate requirements
+- [ ] **ARCHITECTURE.md updated** with any structural changes
+- [ ] **SPEC.md updated** with new capabilities and dependencies
+- [ ] **AGENTS.md updated** with new usage patterns
+- [ ] **TASKS.md updated** with completion status and test counts
+- [ ] **All code examples tested** and working
+- [ ] **Version numbers consistent** across all files
+- [ ] **Dependency lists accurate** and matching between files
+- [ ] **Test counts verified** and updated in all locations
+- [ ] **Feature lists complete** and consistent
+
+## Common Documentation Mistakes to Avoid
+
+### ❌ Don't Do This:
+- Leave outdated test counts in documentation
+- Show Python 3.11+ when project supports 3.8+
+- Include non-working code examples
+- Forget to update feature lists when adding capabilities
+- Leave TODO comments in documentation
+- Use inconsistent terminology across files
+
+### ✅ Do This:
+- Verify test counts with `pytest --collect-only -q | tail -1`
+- Test all code examples before committing
+- Use consistent feature descriptions across all docs
+- Update ALL relevant files when making changes
+- Keep examples simple but complete
+- Cross-reference information for consistency
+
+## Emergency Documentation Fixes
+
+If documentation becomes inconsistent:
+
+1. **Stop development work immediately**
+2. **Run full test suite** to get accurate counts
+3. **Check actual Python version requirements** in pyproject.toml
+4. **Verify actual dependencies** in requirements.txt and pyproject.toml
+5. **Update ALL documentation files** with correct information
+6. **Test all code examples** in documentation
+7. **Commit documentation fixes** before continuing development
+
+Remember: **Accurate documentation is as important as working code!**

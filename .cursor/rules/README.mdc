@@ -1,0 +1,171 @@
+# Text Extractor Project Rules Overview
+
+This directory contains comprehensive coding standards and development guidelines for the text extraction tool project.
+
+## Rule Files Overview
+
+### 📋 [python-standards.mdc](./python-standards.mdc)
+**Python coding standards and best practices**
+- Type hints and annotations
+- Docstring standards (NumPy style)
+- Code formatting with Black (88 chars)
+- Import organization
+- Error handling patterns
+- Async/await best practices
+
+### 🧪 [testing-standards.mdc](./testing-standards.mdc)
+**Comprehensive testing guidelines**
+- Test organization and structure
+- Pytest configuration and usage
+- Coverage requirements (>80%)
+- Async testing with pytest-asyncio
+- Edge case and error testing
+- Performance testing patterns
+
+### 🔄 [development-workflow.mdc](./development-workflow.mdc)
+**Development workflow and quality assurance**
+- Pre-commit requirements (linting, testing, formatting)
+- Git workflow and commit standards
+- Code review checklist
+- CI/CD pipeline requirements
+- Environment setup standards
+
+### 📚 [documentation-maintenance.mdc](./documentation-maintenance.mdc)
+**Documentation accuracy and maintenance**
+- **CRITICAL**: Update all docs after completing tasks
+- Documentation files that must stay current
+- Test count verification procedures
+- Cross-file consistency requirements
+- Documentation quality standards
+
+### 🔧 [text-extraction-patterns.mdc](./text-extraction-patterns.mdc)
+**Project-specific implementation patterns**
+- Parser interface standards
+- OCR integration patterns
+- Plugin development guidelines
+- Async implementation standards
+- Error handling for text extraction
+
+## Quick Reference: Pre-Commit Checklist
+
+Before every commit, **ALWAYS** run:
+
+```bash
+# 1. Format and lint
+black .
+ruff check . --fix
+ruff check .
+
+# 2. Run tests
+pytest --cov=text_extractor --cov-report=term-missing
+
+# 3. Update documentation
+# - Verify test count: pytest --collect-only -q | tail -1
+# - Update README.md, TASKS.md, etc. with any changes
+# - Test all code examples in documentation
+
+# 4. Final verification
+pytest --tb=short -q
+```
+
+## Critical Rules Summary
+
+### 🚨 NEVER Commit Without:
+1. **All 211 tests passing** (verify with `pytest`)
+2. **Clean linting** (verify with `ruff check .`)
+3. **Proper formatting** (verify with `black --check .`)
+4. **Updated documentation** (all relevant .md files)
+5. **Correct test counts** in documentation files
+
+### 🚨 ALWAYS Include:
+1. **Type hints** for all function parameters and returns
+2. **Docstrings** for all public functions and classes
+3. **Error handling** with specific exception types
+4. **Tests** for new functionality and edge cases
+5. **Documentation updates** for any changes
+
+### 🚨 Documentation Files to Update:
+When making changes, update these files as needed:
+- `README.md` - Features, installation, usage, test count
+- `ARCHITECTURE.md` - Module structure, components
+- `SPEC.md` - Supported formats, dependencies, features
+- `AGENTS.md` - AI agent guidance, usage patterns
+- `TASKS.md` - Project status, test counts
+
+## Common Violations to Avoid
+
+### ❌ Code Quality Violations:
+- Missing type hints on function parameters/returns
+- Missing docstrings on public functions
+- Generic exception handling (`except Exception:`)
+- Inconsistent code formatting
+- Unused imports or variables
+
+### ❌ Testing Violations:
+- Committing with failing tests
+- Missing tests for new functionality
+- Not testing error conditions
+- Poor test organization or naming
+
+### ❌ Documentation Violations:
+- **Outdated test counts in documentation**
+- **Incorrect Python version requirements**
+- **Missing feature documentation**
+- **Non-working code examples**
+- **Inconsistent information across files**
+
+## Project-Specific Requirements
+
+### Parser Implementation:
+- Follow unified `parse(file_path: str) -> ExtractedText` interface
+- Handle file validation and error cases
+- Set OCR flags correctly
+- Provide page-level breakdown
+
+### Async Support:
+- Implement both sync and async versions of parsers
+- Use proper async patterns with `asyncio`
+- Test async functionality thoroughly
+- Maintain compatibility between sync/async versions
+
+### Plugin System:
+- Follow plugin registration patterns
+- Include `register_parsers(registry)` function
+- Support both sync and async parsers
+- Test plugin loading and functionality
+
+## Getting Started
+
+1. **Read all rule files** in this directory
+2. **Set up development environment** per development-workflow.mdc
+3. **Configure your IDE** with Black, Ruff, and pytest
+4. **Install pre-commit hooks**: `pre-commit install`
+5. **Run initial checks**: `pytest && ruff check . && black --check .`
+
+## Emergency Procedures
+
+### If Tests Are Failing:
+1. **Stop all development work**
+2. **Fix failing tests immediately**
+3. **Verify all 211 tests pass**
+4. **Update documentation if test count changed**
+
+### If Documentation Is Inconsistent:
+1. **Stop development work**
+2. **Get actual test count**: `pytest --collect-only -q | tail -1`
+3. **Check Python version**: Look at `pyproject.toml`
+4. **Update ALL documentation files** with correct information
+5. **Commit documentation fixes** before continuing
+
+## Success Metrics
+
+Your development workflow is successful when:
+- ✅ All 211 tests pass consistently
+- ✅ Code coverage stays >80%
+- ✅ No linting errors from Ruff
+- ✅ All code formatted with Black
+- ✅ Documentation stays current and accurate
+- ✅ New features include comprehensive tests
+- ✅ All public APIs have complete docstrings
+
+Remember: **These rules exist to maintain code quality and project consistency. Follow them diligently for a successful development experience.**
